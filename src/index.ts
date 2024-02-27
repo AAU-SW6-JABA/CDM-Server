@@ -1,7 +1,6 @@
 import express from "express";
 import db from "./db";
 import "dotenv/config";
-import { errors } from "puppeteer";
 
 // Setup express server
 const app = express();
@@ -24,7 +23,7 @@ async function setupDB() {
     );`
 
     await db`
-    CREATE TABLE IF NOT EXISTS Anetennas(
+    CREATE TABLE IF NOT EXISTS Antennas(
         AID SERIAL PRIMARY KEY,
         X INT,
         Y INT
