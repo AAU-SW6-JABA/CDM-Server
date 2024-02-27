@@ -35,7 +35,7 @@ async function setupDB() {
         Calctime BIGINT,
         X INT,
         Y INT
-    )`
+    );`
 }
 
 // Run db setup then start webserver
