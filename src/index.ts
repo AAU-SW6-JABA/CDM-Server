@@ -1,7 +1,6 @@
 import express from "express";
 import db from "./db";
 import "dotenv/config";
-import { errors } from "puppeteer";
 
 // Setup express server
 const app = express();
