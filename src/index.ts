@@ -17,8 +17,7 @@ async function setupDB() {
     CREATE TABLE IF NOT EXISTS Measurement(
         MID SERIAL PRIMARY KEY,
         IMSI BIGINT NOT NULL,
-        FOREIGN KEY(AID)
-            REFERENCES Anetennas(AID),
+        FOREIGN KEY(AID) REFERENCES Anetennas(AID),
         timestamp BIGINT NOT NULL,
         SNR SMALLINT NOT NULL,
         Strength_DBM SMALLINT NOT NULL
@@ -33,8 +32,7 @@ async function setupDB() {
 
     await db`
     CREATE TABLE IF NOT EXISTS Location(
-        FOREIGN KEY(IMSI)
-            REFERENCES Measurement(IMSI),
+        IMSI BIGINT PRIMARY KEY REFERENCES Measurement(IMSI),
         Calctime BIGINT,
         X INT,
         Y INT
