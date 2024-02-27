@@ -24,7 +24,7 @@ async function setupDB() {
     );`
 
     await db`
-    CREATE TABLE IF NOT EXISTS Anetennas(
+    CREATE TABLE IF NOT EXISTS Antennas(
         AID SERIAL PRIMARY KEY,
         X INT,
         Y INT
