@@ -1,6 +1,7 @@
 import express from "express";
 import db from "./db";
 import "dotenv/config";
+import { errors } from "puppeteer";
 
 // Setup express server
 const app = express();
@@ -11,7 +12,33 @@ app.get("/", (req, res) => {
 
 // Setup database
 async function setupDB() {
-    await db`CREATE TABLE IF NOT EXISTS camel_case (a_test INTEGER, b_test TEXT)`;
+
+    await db`
+    CREATE TABLE IF NOT EXISTS Measurement(
+        MID SERIAL PRIMARY KEY,
+        IMSI BIGINT NOT NULL,
+        FOREIGN KEY(AID)
+            REFERENCES Anetennas(AID),
+        timestamp BIGINT NOT NULL,
+        SNR SMALLINT NOT NULL,
+        Strength_DBM SMALLINT NOT NULL
+    );`
+
+    await db`
+    CREATE TABLE IF NOT EXISTS Anetennas(
+        AID SERIAL PRIMARY KEY,
+        X INT,
+        Y INT
+    );`
+
+    await db`
+    CREATE TABLE IF NOT EXISTS Location(
+        FOREIGN KEY(IMSI)
+            REFERENCES Measurement(IMSI),
+        Calctime BIGINT,
+        X INT,
+        Y INT
+    )`
 }
 
 // Run db setup then start webserver
