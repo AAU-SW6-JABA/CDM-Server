@@ -1,9 +1,9 @@
 import sql from './db.js'
 export class LocationDatabase {
-    async GetLocations(): Promise<{ IMSI: number, x: number, y: number, calctime: number }> {
+    async GetLocations(): Promise<{ imsi: number, x: number, y: number, calctime: number }> {
         const Locations = await sql`
         select
-            IMSI,
+            imsi,
             x,
             y,
             calctime
@@ -13,46 +13,46 @@ export class LocationDatabase {
         return Locations as any
     }
 
-    async GetMeasurements(): Promise<{ MID: number, IMSI: number, AID: number, timestamp: number, strength_DBM: number }> {
+    async GetMeasurements(): Promise<{ mid: number, imsi: number, aid: number, timestamp: number, strengthDBM: number }> {
         const Measurements = await sql`
             select 
-                MID,
-                IMSI,
-                AID,
+                mid,
+                imsi,
+                aid,
                 timestamp,
-                Strength_DBM
+                StrengthDBM
             from
                 Measurement`;
 
         return Measurements as any
     }
 
-    async InsertCalculations(IMSI: number, calctime: number, mid: number) {
+    async InsertCalculations(imsi: number, calctime: number, mid: number) {
         await sql`
         insert into Calculation (
-            IMSI,
+            imsi,
             calctime,
             mid
         )values(
-            ${IMSI},
+            ${imsi},
             ${calctime},
             ${mid}
         )
         `
     }
 
-    async InsertLocations(IMSI: number, calctime: number, X: number, Y: number) {
+    async InsertLocations(imsi: number, calctime: number, x: number, y: number) {
         await sql`
         insert into InsertLocations(
-            IMSI,
+            imsi,
             calctime,
-            X,
+            x,
             y
         )values(
-            ${IMSI},
+            ${imsi},
             ${calctime},
-            ${X},
-            ${Y}
+            ${x},
+            ${y}
         )`
     }
 }

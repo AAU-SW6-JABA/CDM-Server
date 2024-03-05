@@ -12,35 +12,35 @@ export async function setupDB() {
 
     await db`
     CREATE TABLE IF NOT EXISTS Antennas(
-        AID SERIAL PRIMARY KEY,
-        X BIGINT,
-        Y BIGINT
+        aid SERIAL PRIMARY KEY,
+        x BIGINT,
+        y BIGINT
     );`
 
     await db`
     CREATE TABLE IF NOT EXISTS Measurement(
-        MID SERIAL PRIMARY KEY,
-        IMSI BIGINT NOT NULL,
-        AID INT REFERENCES Antennas(AID),
-        timestamp double precision NOT NULL,
-        Strength_DBM SMALLINT NOT NULL
+        mid SERIAL PRIMARY KEY,
+        imsi BIGINT NOT NULL,
+        aid INT REFERENCES Antennas(AID),
+        timestamp DOUBLE PRECISION NOT NULL,
+        strengthDBM DOUBLE PRECISION NOT NULL
     );`
 
     await db`
     CREATE TABLE IF NOT EXISTS Calculation(
-        IMSI BIGINT,
+        imsi BIGINT,
         calctime DOUBLE PRECISION,
-        MID INT REFERENCES Measurement(MID),
-        PRIMARY KEY(IMSI, Calctime, MID)
+        mid INT REFERENCES Measurement(mid),
+        PRIMARY KEY(imsi, calctime, mid)
     ); `
 
     await db`
     CREATE TABLE IF NOT EXISTS Location(
-        IMSI BIGINT REFERENCES Calculation(IMSI),
-        Calctime DOUBLE PRECISION,
-        X BIGINT,
-        Y BIGINT,
-        PRIMARY KEY(IMSI, Calctime)
+        imsi BIGINT REFERENCES Calculation(imsi),
+        calctime DOUBLE PRECISION,
+        x BIGINT,
+        y BIGINT,
+        PRIMARY KEY(imsi, calctime)
     );`
 
     // Run db setup then start webserver
