@@ -43,7 +43,7 @@ export class LocationDatabase {
 
     async InsertLocations(imsi: number, calctime: number, x: number, y: number) {
         await sql`
-        insert into InsertLocations(
+        insert into Location(
             imsi,
             calctime,
             x,
