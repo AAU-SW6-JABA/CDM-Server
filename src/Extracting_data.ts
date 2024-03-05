@@ -20,7 +20,7 @@ export class LocationDatabase {
                 imsi,
                 aid,
                 timestamp,
-                StrengthDBM
+                strengthDBM
             from
                 Measurement`;
 
