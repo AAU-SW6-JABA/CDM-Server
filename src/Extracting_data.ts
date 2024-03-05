@@ -2,12 +2,12 @@ import sql from './db.js'
 export class LocationDatabase {
     async GetLocations(): Promise<{ imsi: number, x: number, y: number, calctime: number }> {
         const Locations = await sql`
-        select
+        SELECT
             imsi,
             x,
             y,
             calctime
-        from
+        FROM
             Location`;
 
         return Locations as any
@@ -15,13 +15,13 @@ export class LocationDatabase {
 
     async GetMeasurements(): Promise<{ mid: number, imsi: number, aid: number, timestamp: number, strengthDBM: number }> {
         const Measurements = await sql`
-            select 
+            SELECT 
                 mid,
                 imsi,
                 aid,
                 timestamp,
                 strengthDBM
-            from
+            FROM
                 Measurement`;
 
         return Measurements as any
@@ -29,11 +29,11 @@ export class LocationDatabase {
 
     async InsertCalculations(imsi: number, calctime: number, mid: number) {
         await sql`
-        insert into Calculation (
+        INSERT INTO Calculation (
             imsi,
             calctime,
             mid
-        )values(
+        )VALUES(
             ${imsi},
             ${calctime},
             ${mid}
@@ -43,12 +43,12 @@ export class LocationDatabase {
 
     async InsertLocations(imsi: number, calctime: number, x: number, y: number) {
         await sql`
-        insert into Location(
+        INSERT INTO Location(
             imsi,
             calctime,
             x,
             y
-        )values(
+        )VALUES(
             ${imsi},
             ${calctime},
             ${x},
