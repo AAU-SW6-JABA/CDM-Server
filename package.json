@@ -1,6 +1,7 @@
 {
   "name": "Crowd-Density-Management",
   "version": "1.0.0",
+  "type": "module",
   "main": "index.js",
   "repository": "git@github.com:Jesper276/Crowd-Density-Management.git",
   "author": "BaBrixx <bastian.b.hansen@gmail.com>",
@@ -18,6 +19,6 @@
     "typescript": "^5.3.3"
   },
   "scripts": {
-    "dev": "nodemon --exec ts-node ./src/index.ts"
+    "dev": "nodemon --exec ts-node-esm ./src/index.ts"
   }
 }
