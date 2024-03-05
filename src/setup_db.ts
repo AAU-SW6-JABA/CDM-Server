@@ -1,14 +1,7 @@
-import express from "express";
 import db from "./db.ts";
 import "dotenv/config";
 
 export async function setupDB() {
-    // Setup express server
-    const app = express();
-    app.use(express.json());
-    app.get("/", (req, res) => {
-        return res.json("Established connection!");
-    });
 
     await db`
     CREATE TABLE IF NOT EXISTS Antennas(
@@ -43,8 +36,6 @@ export async function setupDB() {
         PRIMARY KEY(imsi, calctime)
     );`
 
-    // Run db setup then start webserver
-    app.listen(process.env.PORT);
 }
 
 
