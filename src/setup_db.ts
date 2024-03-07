@@ -20,14 +20,6 @@ export async function setupDB() {
     );`
 
     await db`
-    CREATE TABLE IF NOT EXISTS Calculation(
-        imsi BIGINT,
-        calctime DOUBLE PRECISION,
-        mid INT REFERENCES Measurement(mid),
-        PRIMARY KEY(imsi, calctime, mid)
-    ); `
-
-    await db`
     CREATE TABLE IF NOT EXISTS Location(
         imsi BIGINT REFERENCES Calculation(imsi),
         calctime DOUBLE PRECISION,
@@ -35,6 +27,13 @@ export async function setupDB() {
         y BIGINT,
         PRIMARY KEY(imsi, calctime)
     );`
+    await db`
+    CREATE TABLE IF NOT EXISTS Calculation(
+        imsi BIGINT,
+        calctime DOUBLE PRECISION,
+        mid INT REFERENCES location(mid),
+        PRIMARY KEY(imsi, calctime, mid)
+    ); `
 
 }
 
