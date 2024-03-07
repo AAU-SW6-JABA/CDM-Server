@@ -40,6 +40,6 @@ model measurement {
   imsi         BigInt
   aid          Int           @db.SmallInt
   timestamp    BigInt
-  strength_dbm Int           @db.SmallInt
+  strengthDBM  Int           @db.SmallInt
   calculation  calculation[]
 }
