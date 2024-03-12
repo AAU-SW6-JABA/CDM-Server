@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgres://postgres:CDM_Pass@localhost:5432/CDM_DB"
+  url      = env("DATABASE_URL")
 }
 
 model antennas {
