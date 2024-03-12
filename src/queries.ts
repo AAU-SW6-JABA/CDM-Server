@@ -14,8 +14,8 @@ export class LocationDatabase {
     ): Promise<
         {
             imsi: bigint;
-            x: number | null;
-            y: number | null;
+            x: number;
+            y: number;
             calctime: bigint;
         }[]
     > {
