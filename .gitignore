@@ -145,3 +145,5 @@ dist
 
 **/.DS_Store
 
+#prisma migrations
+.prisma/migrations
