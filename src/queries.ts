@@ -8,7 +8,7 @@ export class LocationDatabase {
         this.Prisma = new PrismaClient();
     }
 
-    async GetLocationsUsingTime(
+    async getLocationsUsingTime(
         startTime: number,
         endTime: number
     ): Promise<
@@ -32,7 +32,7 @@ export class LocationDatabase {
          
         return await this.Prisma.location.findMany(query);;
     }
-    async GetAllLocations(): Promise<
+    async getAllLocations(): Promise<
         {
             imsi: bigint;
             x: number;
@@ -43,7 +43,7 @@ export class LocationDatabase {
         return await this.Prisma.location.findMany();
     }
 
-    async GetAllMeasurements(
+    async getAllMeasurements(
     ): Promise<
         {
             mid: number;
@@ -85,13 +85,13 @@ export class LocationDatabase {
         {
             imsi: bigint;
             calctime: bigint;
-            mid: Number;
+            mid: number;
         }[]
     > {
         return await this.Prisma.calculation.findMany();
     }
 
-    async GetAntennasUsingAid(
+    async getAntennasUsingAid(
         aid: number
     ): Promise<{ aid: number; x: number; y: number }[]> {
         let query: Prisma.antennasFindManyArgs = {};
@@ -104,13 +104,13 @@ export class LocationDatabase {
 
         return await this.Prisma.antennas.findMany(query);
     }
-    async GetAllAntennas():Promise<{aid: number,x:number,y:number}[]>
+    async getAllAntennas():Promise<{aid: number,x:number,y:number}[]>
     {
         return await this.Prisma.antennas.findMany();
     }
 
 
-    async InsertLocations(
+    async insertLocations(
         imsi: bigint,
         calctime: number,
         x: number,
@@ -125,7 +125,7 @@ export class LocationDatabase {
             },
         });
     }
-    async InsertMeasurent(
+    async insertMeasurent(
         imsi: bigint,
         aid: number,
         timestamp: bigint,
@@ -141,7 +141,7 @@ export class LocationDatabase {
         });
     }
 
-    async InsertCalculations(imsi: bigint, calctime: number, mid: number) {
+    async insertCalculations(imsi: bigint, calctime: number, mid: number) {
         await this.Prisma.calculation.create({
             data: {
                 imsi: imsi,
@@ -151,7 +151,7 @@ export class LocationDatabase {
         });
     }
 
-    async InsertAntenna(x: number, y: number) {
+    async insertAntenna(x: number, y: number) {
         await this.Prisma.antennas.create({
             data: {
                 x: x,
