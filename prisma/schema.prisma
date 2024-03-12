@@ -8,10 +8,11 @@ datasource db {
 }
 
 model antennas {
-  aid Int  @id @default(autoincrement())
+  aid         Int           @id @default(autoincrement())
   // X and Y coordinates of the antenna
-  x   Int?
-  y   Int?
+  x           Int
+  y           Int
+  measurement measurement[]
 }
 
 model calculation {
@@ -28,18 +29,20 @@ model calculation {
 model location {
   imsi        BigInt
   calctime    BigInt
-  x           Int?
-  y           Int?
+  x           Int
+  y           Int
   calculation calculation[]
 
   @@id([imsi, calctime])
 }
 
 model measurement {
-  mid          Int           @id @default(autoincrement())
-  imsi         BigInt
-  aid          Int           @db.SmallInt
-  timestamp    BigInt
-  strengthDBM  Int           @db.SmallInt
-  calculation  calculation[]
+  mid         Int    @id @default(autoincrement())
+  imsi        BigInt
+  aid         Int    @db.SmallInt
+  timestamp   BigInt
+  strengthDBM Int    @db.SmallInt
+
+  antennas    antennas      @relation(fields: [aid], references: [aid], onDelete: NoAction, onUpdate: NoAction)
+  calculation calculation[]
 }
