@@ -35,17 +35,15 @@ export class LocationDatabase {
     async GetAllLocations(): Promise<
         {
             imsi: bigint;
-            x: number | null;
-            y: number | null;
+            x: number;
+            y: number;
             calctime: bigint;
         }[]
     > {
         return await this.Prisma.location.findMany();
     }
 
-    async GetMeasurements(
-        startTime?: number,
-        endTime?: number
+    async GetAllMeasurements(
     ): Promise<
         {
             mid: number;
@@ -55,7 +53,21 @@ export class LocationDatabase {
             strengthDBM: number;
         }[]
     > {
-        //if empty returns all
+        return await this.Prisma.measurement.findMany();
+    }
+
+    async getMeasurementsBetweenTimestamps(
+        startTime: number,
+        endTime: number
+    ): Promise<
+        {
+            mid: number;
+            imsi: bigint;
+            aid: number;
+            timestamp: bigint;
+            strengthDBM: number;
+        }[]
+    > {
         let query: Prisma.measurementFindFirstArgs = {};
 
         if (startTime && endTime) {
@@ -66,13 +78,13 @@ export class LocationDatabase {
                 },
             };
         }
-        return await this.Prisma.measurement.findMany(query);;
+        return await this.Prisma.measurement.findMany(query);
     }
 
     async getCalculation(): Promise<
         {
-            imsi: BigInt;
-            calctime: BigInt;
+            imsi: bigint;
+            calctime: bigint;
             mid: Number;
         }[]
     > {
