@@ -24,8 +24,8 @@ export class LocationDatabase {
         if (startTime && endTime) {
             query.where = {
                 calctime: {
-                    gte: BigInt(startTime), //Greater than or equal to
-                    lte: BigInt(endTime), //Less than or equal to
+                    gte: startTime, //Greater than or equal to
+                    lte: endTime, //Less than or equal to
                 },
             };
         }
@@ -73,8 +73,8 @@ export class LocationDatabase {
         if (startTime && endTime) {
             query.where = {
                 timestamp: {
-                    gte: BigInt(startTime), //Greater than or equal to
-                    lte: BigInt(endTime), //Less than or equal to
+                    gte: startTime, //Greater than or equal to
+                    lte: endTime, //Less than or equal to
                 },
             };
         }
