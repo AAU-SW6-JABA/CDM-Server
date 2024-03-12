@@ -24,13 +24,13 @@ export class LocationDatabase {
         if (startTime && endTime) {
             query.where = {
                 calctime: {
-                    gte: BigInt(startTime),
-                    lte: BigInt(endTime),
+                    gte: BigInt(startTime), //Greater than or equal to
+                    lte: BigInt(endTime), //Less than or equal to
                 },
             };
         }
-        const locations = await this.Prisma.location.findMany(query);
-        return locations;
+         
+        return await this.Prisma.location.findMany(query);;
     }
     async GetAllLocations(): Promise<
         {
@@ -40,8 +40,7 @@ export class LocationDatabase {
             calctime: bigint;
         }[]
     > {
-        const locations = await this.Prisma.location.findMany();
-        return locations;
+        return await this.Prisma.location.findMany();
     }
 
     async GetMeasurements(
@@ -56,19 +55,18 @@ export class LocationDatabase {
             strengthDBM: number;
         }[]
     > {
+        //if empty returns all
         let query: Prisma.measurementFindFirstArgs = {};
 
         if (startTime && endTime) {
             query.where = {
                 timestamp: {
-                    gte: BigInt(startTime),
-                    lte: BigInt(endTime),
+                    gte: BigInt(startTime), //Greater than or equal to
+                    lte: BigInt(endTime), //Less than or equal to
                 },
             };
         }
-
-        const Measurement = await this.Prisma.measurement.findMany(query);
-        return Measurement;
+        return await this.Prisma.measurement.findMany(query);;
     }
 
     async getCalculation(): Promise<
@@ -78,8 +76,7 @@ export class LocationDatabase {
             mid: Number;
         }[]
     > {
-        const insertData = await this.Prisma.calculation.findMany();
-        return insertData;
+        return await this.Prisma.calculation.findMany();
     }
 
     async GetAntennasUsingAid(
@@ -107,7 +104,7 @@ export class LocationDatabase {
         x: number,
         y: number
     ) {
-        const InsertData = await this.Prisma.location.create({
+        await this.Prisma.location.create({
             data: {
                 imsi: imsi,
                 calctime: calctime,
@@ -122,7 +119,7 @@ export class LocationDatabase {
         timestamp: bigint,
         strengthDBM: number
     ) {
-        const insertData = await this.Prisma.measurement.create({
+        await this.Prisma.measurement.create({
             data: {
                 imsi: imsi,
                 aid: aid,
@@ -133,7 +130,7 @@ export class LocationDatabase {
     }
 
     async InsertCalculations(imsi: bigint, calctime: number, mid: number) {
-        const insertetData = await this.Prisma.calculation.create({
+        await this.Prisma.calculation.create({
             data: {
                 imsi: imsi,
                 calctime: calctime,
@@ -143,7 +140,7 @@ export class LocationDatabase {
     }
 
     async InsertAntenna(x: number, y: number) {
-        const insertData = await this.Prisma.antennas.create({
+        await this.Prisma.antennas.create({
             data: {
                 x: x,
                 y: y,
