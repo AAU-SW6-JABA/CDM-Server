@@ -19,5 +19,5 @@ yarn run prisma migrate dev --name init
 In order to create a client that can interact with the database the following command has to be run in the terminal:
 
 ```
-prisma generate
+yarn run prisma generate
 ````
