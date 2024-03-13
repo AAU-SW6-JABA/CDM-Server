@@ -1,0 +1,48 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model antennas {
+  aid         Int           @id @default(autoincrement())
+  // X and Y coordinates of the antenna
+  x           Int
+  y           Int
+  measurement measurement[]
+}
+
+model calculation {
+  imsi     BigInt
+  calctime BigInt
+  mid      Int
+
+  measurement measurement @relation(fields: [mid], references: [mid], onDelete: NoAction, onUpdate: NoAction)
+  location    location    @relation(fields: [imsi, calctime], references: [imsi, calctime], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([imsi, calctime, mid])
+}
+
+model location {
+  imsi        BigInt
+  calctime    BigInt
+  x           Int
+  y           Int
+  calculation calculation[]
+
+  @@id([imsi, calctime])
+}
+
+model measurement {
+  mid         Int    @id @default(autoincrement())
+  imsi        BigInt
+  aid         Int    @db.SmallInt
+  timestamp   BigInt
+  strengthDBM Int    @db.SmallInt
+
+  antennas    antennas      @relation(fields: [aid], references: [aid], onDelete: NoAction, onUpdate: NoAction)
+  calculation calculation[]
+}
