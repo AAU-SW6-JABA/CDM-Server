@@ -1,16 +1,16 @@
 import * as grpc from '@grpc/grpc-js';
 import * as protoLoader from '@grpc/proto-loader';
-import { ProtoGrpcType } from '../../build/protobuf/route_guide';
-import { RoutesHandlers } from '../../build/protobuf/Routes';
-import { Empty__Output, Empty } from '../../build/protobuf/Empty';
-import { GetAntennasResponse } from '../../build/protobuf/GetAntennasResponse';
-import { GetLocationsRequest__Output } from '../../build/protobuf/GetLocationsRequest';
-import { GetLocationsResponse } from '../../build/protobuf/GetLocationsResponse';
-import { LocationMeasurementsRequest__Output } from '../../build/protobuf/LocationMeasurementsRequest';
-import { LocationMeasurementsResponse } from '../../build/protobuf/LocationMeasurementsResponse';
-import { LogMeasurementRequest__Output } from '../../build/protobuf/LogMeasurementRequest';
-import { RegisterAntennaRequest__Output } from '../../build/protobuf/RegisterAntennaRequest';
-import { RegisterAntennaResponse } from '../../build/protobuf/RegisterAntennaResponse';
+import { ProtoGrpcType } from '../../build/protobuf/route_guide.ts';
+import { RoutesHandlers } from '../../build/protobuf/Routes.ts';
+import { Empty__Output, Empty } from '../../build/protobuf/Empty.ts';
+import { GetAntennasResponse } from '../../build/protobuf/GetAntennasResponse.ts';
+import { GetLocationsRequest__Output } from '../../build/protobuf/GetLocationsRequest.ts';
+import { GetLocationsResponse } from '../../build/protobuf/GetLocationsResponse.ts';
+import { LocationMeasurementsRequest__Output } from '../../build/protobuf/LocationMeasurementsRequest.ts';
+import { LocationMeasurementsResponse } from '../../build/protobuf/LocationMeasurementsResponse.ts';
+import { LogMeasurementRequest__Output } from '../../build/protobuf/LogMeasurementRequest.ts';
+import { RegisterAntennaRequest__Output } from '../../build/protobuf/RegisterAntennaRequest.ts';
+import { RegisterAntennaResponse } from '../../build/protobuf/RegisterAntennaResponse.ts';
 
 const PROTO_PATH = '../../CDM-ProtocolBuffer/route_guide.proto';
 
