@@ -147,3 +147,6 @@ dist
 
 # Ignore the build directory
 build/
+
+#prisma migrations
+.prisma/migrations

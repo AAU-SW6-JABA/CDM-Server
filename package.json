@@ -1,6 +1,7 @@
 {
   "name": "Crowd-Density-Management",
   "version": "1.0.0",
+  "type": "module",
   "main": "index.js",
   "repository": "git@github.com:Jesper276/Crowd-Density-Management.git",
   "author": "BaBrixx <bastian.b.hansen@gmail.com>",
@@ -9,17 +10,18 @@
     "@grpc/grpc-js": "^1.10.2",
     "@grpc/proto-loader": "^0.7.10",
     "@types/express": "^4.17.21",
-    "@types/node": "^20.11.19",
+    "@prisma/client": "^5.10.2",
+    "@types/node": "^20.11.24",
     "dotenv": "^16.4.5",
-    "express": "^4.18.2",
     "nodemon": "^3.0.3",
     "pg": "^8.11.3",
     "postgres": "^3.4.3",
+    "prisma": "^5.10.2",
     "reflect-metadata": "^0.2.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
   },
   "scripts": {
-    "dev": "nodemon --exec ts-node ./src/index.ts"
+    "dev": "nodemon --exec ts-node-esm ./src/index.ts"
   }
 }
