@@ -57,7 +57,10 @@ export class GRPCServer {
             callback(new Error('Expected x and y coordinates'));
             return;
         } else {
-            this.db.insertAntenna(inputx as unknown as number, inputy as unknown as number);
+            this.db.insertAntenna(inputx.toNumber(), inputy.toNumber()).then((antenna) => {
+                callback(null, {aid: antenna.aid});
+            }); 
+            
         }
     };
 

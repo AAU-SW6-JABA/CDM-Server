@@ -1,5 +1,5 @@
 import { Prisma, PrismaClient } from "@prisma/client";
-
+import type { antennas, location, calculation, measurement } from "@prisma/client";
 
 export class LocationDatabase {
     public Prisma: PrismaClient;
@@ -151,12 +151,16 @@ export class LocationDatabase {
         });
     }
 
-    async insertAntenna(x: number, y: number) {
-        await this.Prisma.antennas.create({
+    async insertAntenna(x: number, y: number) : Promise<antennas> {
+        const antenna = await this.Prisma.antennas.create({
             data: {
                 x: x,
                 y: y,
             },
         });
+
+        this.Prisma.antennas.fields
+        return antenna;
     }
+    
 }
