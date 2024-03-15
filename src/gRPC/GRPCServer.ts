@@ -54,13 +54,13 @@ export class GRPCServer {
         let inputy : protoLoader.Long | undefined =  call.request.y;
 
         if(inputx === undefined || inputy === undefined){
-            callback(new Error('Expected x and y coordinates'));
-            return;
+            callback({code: grpc.status.INVALID_ARGUMENT, details: 'Expected x and y coordinates'});
         } else {
             this.db.insertAntenna(inputx.toNumber(), inputy.toNumber()).then((antenna) => {
                 callback(null, {aid: antenna.aid});
+            }).catch((err) => {
+                callback({code: grpc.status.CANCELLED, details: `Error inserting antenna: ${err}`});
             }); 
-            
         }
     };
 

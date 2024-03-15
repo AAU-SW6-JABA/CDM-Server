@@ -158,8 +158,6 @@ export class LocationDatabase {
                 y: y,
             },
         });
-
-        this.Prisma.antennas.fields
         return antenna;
     }
     
