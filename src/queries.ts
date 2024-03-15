@@ -2,7 +2,7 @@ import { Prisma, PrismaClient } from "@prisma/client";
 
 
 export class LocationDatabase {
-    private Prisma: PrismaClient;
+    public Prisma: PrismaClient;
 
     constructor() {
         this.Prisma = new PrismaClient();

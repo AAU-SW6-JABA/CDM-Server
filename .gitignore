@@ -149,4 +149,4 @@ dist
 build/
 
 #prisma migrations
-.prisma/migrations
+prisma/migrations
