@@ -1,5 +1,10 @@
 import { Prisma, PrismaClient } from "@prisma/client";
-import type { antennas, location, calculation, measurement } from "@prisma/client";
+import type {
+    antennas,
+    location,
+    calculation,
+    measurement,
+} from "@prisma/client";
 
 export class LocationDatabase {
     public Prisma: PrismaClient;
@@ -29,8 +34,8 @@ export class LocationDatabase {
                 },
             };
         }
-         
-        return await this.Prisma.location.findMany(query);;
+
+        return await this.Prisma.location.findMany(query);
     }
     async getAllLocations(): Promise<
         {
@@ -43,8 +48,7 @@ export class LocationDatabase {
         return await this.Prisma.location.findMany();
     }
 
-    async getAllMeasurements(
-    ): Promise<
+    async getAllMeasurements(): Promise<
         {
             mid: number;
             imsi: bigint;
@@ -104,11 +108,9 @@ export class LocationDatabase {
 
         return await this.Prisma.antennas.findMany(query);
     }
-    async getAllAntennas():Promise<{aid: number,x:number,y:number}[]>
-    {
+    async getAllAntennas(): Promise<{ aid: number; x: number; y: number }[]> {
         return await this.Prisma.antennas.findMany();
     }
-
 
     async insertLocations(
         imsi: bigint,
@@ -151,7 +153,7 @@ export class LocationDatabase {
         });
     }
 
-    async insertAntenna(x: number, y: number) : Promise<antennas> {
+    async insertAntenna(x: number, y: number): Promise<antennas> {
         const antenna = await this.Prisma.antennas.create({
             data: {
                 x: x,
@@ -160,5 +162,4 @@ export class LocationDatabase {
         });
         return antenna;
     }
-    
 }
