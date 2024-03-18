@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 //Start the gRPC server
-const server = new GRPCServer('../CDM-ProtocolBuffer/route_guide.proto').getServer();
+const server = new GRPCServer('CDM-ProtocolBuffer/route_guide.proto').getServer();
 server.bindAsync(`localhost:${process.env.PORT}`, grpc.ServerCredentials.createInsecure(), (err, port) => {
-    server.start();
+    server;
 });
