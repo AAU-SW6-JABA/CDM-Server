@@ -93,7 +93,7 @@ export class GRPCServer {
                 callback({
                     code: grpc.status.INVALID_ARGUMENT,
                     details:
-                        "Expected imsi, aid, timestamp, and signalStrength. Got Undefined",
+                        "Expected identifier, aid, timestamp, and signalStrength. Got Undefined",
                 });
                 return;
             }
