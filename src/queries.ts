@@ -1,8 +1,13 @@
 import { Prisma, PrismaClient } from "@prisma/client";
-
+import type {
+    antennas,
+    location,
+    calculation,
+    measurement,
+} from "@prisma/client";
 
 export class LocationDatabase {
-    private Prisma: PrismaClient;
+    public Prisma: PrismaClient;
 
     constructor() {
         this.Prisma = new PrismaClient();
@@ -11,14 +16,7 @@ export class LocationDatabase {
     async getLocationsUsingTime(
         startTime: number,
         endTime: number
-    ): Promise<
-        {
-            imsi: bigint;
-            x: number;
-            y: number;
-            calctime: bigint;
-        }[]
-    > {
+    ): Promise<location[]> {
         let query: Prisma.locationFindManyArgs = {};
 
         if (startTime && endTime) {
@@ -29,45 +27,21 @@ export class LocationDatabase {
                 },
             };
         }
-         
-        return await this.Prisma.location.findMany(query);;
+
+        return await this.Prisma.location.findMany(query);
     }
-    async getAllLocations(): Promise<
-        {
-            imsi: bigint;
-            x: number;
-            y: number;
-            calctime: bigint;
-        }[]
-    > {
+    async getAllLocations(): Promise<location[]> {
         return await this.Prisma.location.findMany();
     }
 
-    async getAllMeasurements(
-    ): Promise<
-        {
-            mid: number;
-            imsi: bigint;
-            aid: number;
-            timestamp: bigint;
-            strengthDBM: number;
-        }[]
-    > {
+    async getAllMeasurements(): Promise<measurement[]> {
         return await this.Prisma.measurement.findMany();
     }
 
     async getMeasurementsBetweenTimestamps(
         startTime: number,
         endTime: number
-    ): Promise<
-        {
-            mid: number;
-            imsi: bigint;
-            aid: number;
-            timestamp: bigint;
-            strengthDBM: number;
-        }[]
-    > {
+    ): Promise<measurement[]> {
         let query: Prisma.measurementFindFirstArgs = {};
 
         if (startTime && endTime) {
@@ -81,19 +55,13 @@ export class LocationDatabase {
         return await this.Prisma.measurement.findMany(query);
     }
 
-    async getCalculation(): Promise<
-        {
-            imsi: bigint;
-            calctime: bigint;
-            mid: number;
-        }[]
-    > {
+    async getCalculation(): Promise<calculation[]> {
         return await this.Prisma.calculation.findMany();
     }
 
     async getAntennasUsingAid(
         aid: number
-    ): Promise<{ aid: number; x: number; y: number }[]> {
+    ): Promise<antennas[]> {
         let query: Prisma.antennasFindManyArgs = {};
 
         if (aid) {
@@ -104,36 +72,34 @@ export class LocationDatabase {
 
         return await this.Prisma.antennas.findMany(query);
     }
-    async getAllAntennas():Promise<{aid: number,x:number,y:number}[]>
-    {
+    async getAllAntennas(): Promise<antennas[]> {
         return await this.Prisma.antennas.findMany();
     }
 
-
     async insertLocations(
-        imsi: bigint,
+        identifier: string,
         calctime: number,
         x: number,
         y: number
     ) {
         await this.Prisma.location.create({
             data: {
-                imsi: imsi,
+                identifier: identifier,
                 calctime: calctime,
                 x: x,
                 y: y,
             },
         });
     }
-    async insertMeasurent(
-        imsi: bigint,
+    async insertMeasurement(
+        identifier: string,
         aid: number,
-        timestamp: bigint,
+        timestamp: number,
         strengthDBM: number
     ) {
         await this.Prisma.measurement.create({
             data: {
-                imsi: imsi,
+                identifier: identifier,
                 aid: aid,
                 timestamp: timestamp,
                 strengthDBM: strengthDBM,
@@ -141,22 +107,23 @@ export class LocationDatabase {
         });
     }
 
-    async insertCalculations(imsi: bigint, calctime: number, mid: number) {
+    async insertCalculations(identifier: string, calctime: number, mid: number) {
         await this.Prisma.calculation.create({
             data: {
-                imsi: imsi,
+                identifier: identifier,
                 calctime: calctime,
                 mid: mid,
             },
         });
     }
 
-    async insertAntenna(x: number, y: number) {
-        await this.Prisma.antennas.create({
+    async insertAntenna(x: number, y: number): Promise<antennas> {
+        const antenna = await this.Prisma.antennas.create({
             data: {
                 x: x,
                 y: y,
             },
         });
+        return antenna;
     }
 }
