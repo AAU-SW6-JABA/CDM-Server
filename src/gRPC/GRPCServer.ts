@@ -76,11 +76,11 @@ export class GRPCServer {
         ) => this.registerAntennaRoute(call, callback),
     };
 
-    //TODO: USES TOSTRING
     logMeasurementRoute(call: grpc.ServerReadableStream<LogMeasurementRequest__Output, Empty>, callback: grpc.sendUnaryData<Empty>): void {
         call.on("data", (measurement : LogMeasurementRequest__Output) => {
-            //Validate inputs
-            if (measurement.identifier === undefined || measurement.aid === undefined || measurement.timestamp === undefined || measurement.signalStrength === undefined) {
+            
+            if (measurement.identifier === undefined || measurement.aid === undefined || 
+                measurement.timestamp === undefined || measurement.signalStrength === undefined) {
                 callback({
                     code: grpc.status.INVALID_ARGUMENT,
                     details: "Expected imsi, aid, timestamp, and signalStrength. Got Undefined",
@@ -99,6 +99,7 @@ export class GRPCServer {
             callback(null, {});
         });
     }
+
 
     registerAntennaRoute(
         call: grpc.ServerUnaryCall<
