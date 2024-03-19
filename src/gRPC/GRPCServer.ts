@@ -1,17 +1,17 @@
 import * as grpc from "@grpc/grpc-js";
 import * as protoLoader from "@grpc/proto-loader";
 import { LocationDatabase } from "../queries.ts";
-import { ProtoGrpcType } from "../../build/protobuf/route_guide.ts";
-import { RoutesHandlers } from "../../build/protobuf/Routes.ts";
-import { Empty__Output, Empty } from "../../build/protobuf/Empty.ts";
-import { GetAntennasResponse } from "../../build/protobuf/GetAntennasResponse.ts";
-import { GetLocationsRequest__Output } from "../../build/protobuf/GetLocationsRequest.ts";
-import { GetLocationsResponse } from "../../build/protobuf/GetLocationsResponse.ts";
-import { LocationMeasurementsRequest__Output } from "../../build/protobuf/LocationMeasurementsRequest.ts";
-import { LocationMeasurementsResponse } from "../../build/protobuf/LocationMeasurementsResponse.ts";
-import { LogMeasurementRequest__Output } from "../../build/protobuf/LogMeasurementRequest.ts";
-import { RegisterAntennaRequest__Output } from "../../build/protobuf/RegisterAntennaRequest.ts";
-import { RegisterAntennaResponse } from "../../build/protobuf/RegisterAntennaResponse.ts";
+import { ProtoGrpcType } from "../../build/protobuf/cdm_protobuf.ts"; 
+import { RoutesHandlers } from "../../build/protobuf/cdm_protobuf/Routes.ts"; 
+import { Empty__Output, Empty } from "../../build/protobuf/cdm_protobuf/Empty.ts";
+import { GetAntennasResponse } from "../../build/protobuf/cdm_protobuf/GetAntennasResponse.ts";
+import { GetLocationsRequest__Output } from "../../build/protobuf/cdm_protobuf/GetLocationsRequest.ts";
+import { GetLocationsResponse } from "../../build/protobuf/cdm_protobuf/GetLocationsResponse.ts";
+import { LocationMeasurementsRequest__Output } from "../../build/protobuf/cdm_protobuf/LocationMeasurementsRequest.ts";
+import { LocationMeasurementsResponse } from "../../build/protobuf/cdm_protobuf/LocationMeasurementsResponse.ts";
+import { LogMeasurementRequest__Output } from "../../build/protobuf/cdm_protobuf/LogMeasurementRequest.ts";
+import { RegisterAntennaRequest__Output } from "../../build/protobuf/cdm_protobuf/RegisterAntennaRequest.ts";
+import { RegisterAntennaResponse } from "../../build/protobuf/cdm_protobuf/RegisterAntennaResponse.ts";
 
 export class GRPCServer {
     cdm_protobuffer: ProtoGrpcType;
@@ -58,15 +58,14 @@ export class GRPCServer {
         ): void {
             throw new Error("Function not implemented.");
         },
-        LogMeasurementRoute: function (
+        LogMeasurementRoute: (
             call: grpc.ServerReadableStream<
                 LogMeasurementRequest__Output,
                 Empty
             >,
             callback: grpc.sendUnaryData<Empty>
-        ): void {
-            throw new Error("Function not implemented.");
-        },
+        ) => this.logMeasurementRoute(call, callback),
+
         //Registers a new antenna
         RegisterAntennaRoute: (
             call: grpc.ServerUnaryCall<
@@ -77,6 +76,30 @@ export class GRPCServer {
         ) => this.registerAntennaRoute(call, callback),
     };
 
+    //TODO: USES TOSTRING
+    logMeasurementRoute(call: grpc.ServerReadableStream<LogMeasurementRequest__Output, Empty>, callback: grpc.sendUnaryData<Empty>): void {
+        call.on("data", (measurement : LogMeasurementRequest__Output) => {
+            //Validate inputs
+            if (measurement.identifier === undefined || measurement.aid === undefined || measurement.timestamp === undefined || measurement.signalStrength === undefined) {
+                callback({
+                    code: grpc.status.INVALID_ARGUMENT,
+                    details: "Expected imsi, aid, timestamp, and signalStrength. Got Undefined",
+                });
+                return;
+            }
+            this.db.insertMeasurement(measurement.identifier, measurement.aid, measurement.timestamp, measurement.signalStrength)
+            .catch((err) => {
+                callback({
+                    code: grpc.status.CANCELLED,
+                    details: `Error inserting measurement: ${err}`,
+                });
+            });
+        });
+        call.on("end", () => {
+            callback(null, {});
+        });
+    }
+
     registerAntennaRoute(
         call: grpc.ServerUnaryCall<
             RegisterAntennaRequest__Output,
@@ -84,8 +107,8 @@ export class GRPCServer {
         >,
         callback: grpc.sendUnaryData<RegisterAntennaResponse>
     ): void {
-        let inputx: protoLoader.Long | undefined = call.request.x;
-        let inputy: protoLoader.Long | undefined = call.request.y;
+        let inputx: number | undefined = call.request.x;
+        let inputy: number | undefined = call.request.y;
 
         if (inputx === undefined || inputy === undefined) {
             callback({
@@ -94,7 +117,7 @@ export class GRPCServer {
             });
         } else {
             this.db
-                .insertAntenna(inputx.toNumber(), inputy.toNumber())
+                .insertAntenna(inputx, inputy)
                 .then((antenna) => {
                     callback(null, { aid: antenna.aid });
                 })
@@ -112,7 +135,7 @@ export class GRPCServer {
         const server = new grpc.Server();
 
         server.addService(
-            this.cdm_protobuffer.Routes.service,
+            this.cdm_protobuffer.cdm_protobuf.Routes.service,
             this.routeHandlers
         );
         return server;

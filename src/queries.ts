@@ -16,14 +16,7 @@ export class LocationDatabase {
     async getLocationsUsingTime(
         startTime: number,
         endTime: number
-    ): Promise<
-        {
-            imsi: string;
-            x: number;
-            y: number;
-            calctime: bigint;
-        }[]
-    > {
+    ): Promise<location[]> {
         let query: Prisma.locationFindManyArgs = {};
 
         if (startTime && endTime) {
@@ -37,41 +30,18 @@ export class LocationDatabase {
 
         return await this.Prisma.location.findMany(query);
     }
-    async getAllLocations(): Promise<
-        {
-            imsi: string;
-            x: number;
-            y: number;
-            calctime: bigint;
-        }[]
-    > {
+    async getAllLocations(): Promise<location[]> {
         return await this.Prisma.location.findMany();
     }
 
-    async getAllMeasurements(): Promise<
-        {
-            mid: number;
-            imsi: string;
-            aid: number;
-            timestamp: bigint;
-            strengthDBM: number;
-        }[]
-    > {
+    async getAllMeasurements(): Promise<measurement[]> {
         return await this.Prisma.measurement.findMany();
     }
 
     async getMeasurementsBetweenTimestamps(
         startTime: number,
         endTime: number
-    ): Promise<
-        {
-            mid: number;
-            imsi: string;
-            aid: number;
-            timestamp: bigint;
-            strengthDBM: number;
-        }[]
-    > {
+    ): Promise<measurement[]> {
         let query: Prisma.measurementFindFirstArgs = {};
 
         if (startTime && endTime) {
@@ -85,19 +55,13 @@ export class LocationDatabase {
         return await this.Prisma.measurement.findMany(query);
     }
 
-    async getCalculation(): Promise<
-        {
-            imsi: string;
-            calctime: bigint;
-            mid: number;
-        }[]
-    > {
+    async getCalculation(): Promise<calculation[]> {
         return await this.Prisma.calculation.findMany();
     }
 
     async getAntennasUsingAid(
         aid: number
-    ): Promise<{ aid: number; x: number; y: number }[]> {
+    ): Promise<antennas[]> {
         let query: Prisma.antennasFindManyArgs = {};
 
         if (aid) {
@@ -108,7 +72,7 @@ export class LocationDatabase {
 
         return await this.Prisma.antennas.findMany(query);
     }
-    async getAllAntennas(): Promise<{ aid: number; x: number; y: number }[]> {
+    async getAllAntennas(): Promise<antennas[]> {
         return await this.Prisma.antennas.findMany();
     }
 
@@ -130,7 +94,7 @@ export class LocationDatabase {
     async insertMeasurement(
         imsi: string,
         aid: number,
-        timestamp: bigint,
+        timestamp: number,
         strengthDBM: number
     ) {
         await this.Prisma.measurement.create({
