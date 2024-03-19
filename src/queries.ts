@@ -18,7 +18,7 @@ export class LocationDatabase {
         endTime: number
     ): Promise<
         {
-            imsi: bigint;
+            imsi: string;
             x: number;
             y: number;
             calctime: bigint;
@@ -39,7 +39,7 @@ export class LocationDatabase {
     }
     async getAllLocations(): Promise<
         {
-            imsi: bigint;
+            imsi: string;
             x: number;
             y: number;
             calctime: bigint;
@@ -51,7 +51,7 @@ export class LocationDatabase {
     async getAllMeasurements(): Promise<
         {
             mid: number;
-            imsi: bigint;
+            imsi: string;
             aid: number;
             timestamp: bigint;
             strengthDBM: number;
@@ -66,7 +66,7 @@ export class LocationDatabase {
     ): Promise<
         {
             mid: number;
-            imsi: bigint;
+            imsi: string;
             aid: number;
             timestamp: bigint;
             strengthDBM: number;
@@ -87,7 +87,7 @@ export class LocationDatabase {
 
     async getCalculation(): Promise<
         {
-            imsi: bigint;
+            imsi: string;
             calctime: bigint;
             mid: number;
         }[]
@@ -113,7 +113,7 @@ export class LocationDatabase {
     }
 
     async insertLocations(
-        imsi: bigint,
+        imsi: string,
         calctime: number,
         x: number,
         y: number
@@ -127,8 +127,8 @@ export class LocationDatabase {
             },
         });
     }
-    async insertMeasurent(
-        imsi: bigint,
+    async insertMeasurement(
+        imsi: string,
         aid: number,
         timestamp: bigint,
         strengthDBM: number
@@ -143,7 +143,7 @@ export class LocationDatabase {
         });
     }
 
-    async insertCalculations(imsi: bigint, calctime: number, mid: number) {
+    async insertCalculations(imsi: string, calctime: number, mid: number) {
         await this.Prisma.calculation.create({
             data: {
                 imsi: imsi,

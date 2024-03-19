@@ -1,5 +1,8 @@
 # Crowd-Density-Management
 
+# Submodules
+This project uses the submodule at
+
 # Initializing the p
 Run the shell script setup-proto.sh, which installs dependencies using yarn, and creates ts types for the GRPC protobuffer.
 

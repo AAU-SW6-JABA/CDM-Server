@@ -16,7 +16,7 @@ model antennas {
 }
 
 model calculation {
-  imsi     BigInt
+  imsi     String
   calctime BigInt
   mid      Int
 
@@ -27,7 +27,7 @@ model calculation {
 }
 
 model location {
-  imsi        BigInt
+  imsi        String
   calctime    BigInt
   x           Int
   y           Int
@@ -38,7 +38,7 @@ model location {
 
 model measurement {
   mid         Int    @id @default(autoincrement())
-  imsi        BigInt
+  imsi        String
   aid         Int    @db.SmallInt
   timestamp   BigInt
   strengthDBM Int    @db.SmallInt
