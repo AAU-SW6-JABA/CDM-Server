@@ -1,9 +1,12 @@
 import * as grpc from "@grpc/grpc-js";
 import * as protoLoader from "@grpc/proto-loader";
 import { LocationDatabase } from "../queries.ts";
-import { ProtoGrpcType } from "../../build/protobuf/cdm_protobuf.ts"; 
-import { RoutesHandlers } from "../../build/protobuf/cdm_protobuf/Routes.ts"; 
-import { Empty__Output, Empty } from "../../build/protobuf/cdm_protobuf/Empty.ts";
+import { ProtoGrpcType } from "../../build/protobuf/cdm_protobuf.ts";
+import { RoutesHandlers } from "../../build/protobuf/cdm_protobuf/Routes.ts";
+import {
+    Empty__Output,
+    Empty,
+} from "../../build/protobuf/cdm_protobuf/Empty.ts";
 import { GetAntennasResponse } from "../../build/protobuf/cdm_protobuf/GetAntennasResponse.ts";
 import { GetLocationsRequest__Output } from "../../build/protobuf/cdm_protobuf/GetLocationsRequest.ts";
 import { GetLocationsResponse } from "../../build/protobuf/cdm_protobuf/GetLocationsResponse.ts";
@@ -76,30 +79,42 @@ export class GRPCServer {
         ) => this.registerAntennaRoute(call, callback),
     };
 
-    logMeasurementRoute(call: grpc.ServerReadableStream<LogMeasurementRequest__Output, Empty>, callback: grpc.sendUnaryData<Empty>): void {
-        call.on("data", (measurement : LogMeasurementRequest__Output) => {
-            
-            if (measurement.identifier === undefined || measurement.aid === undefined || 
-                measurement.timestamp === undefined || measurement.signalStrength === undefined) {
+    logMeasurementRoute(
+        call: grpc.ServerReadableStream<LogMeasurementRequest__Output, Empty>,
+        callback: grpc.sendUnaryData<Empty>
+    ): void {
+        call.on("data", (measurement: LogMeasurementRequest__Output) => {
+            if (
+                typeof measurement.identifier !== "string" ||
+                typeof measurement.aid !== "number" ||
+                typeof measurement.timestamp !== "number" ||
+                typeof measurement.signalStrength !== "number"
+            ) {
                 callback({
                     code: grpc.status.INVALID_ARGUMENT,
-                    details: "Expected imsi, aid, timestamp, and signalStrength. Got Undefined",
+                    details:
+                        "Expected imsi, aid, timestamp, and signalStrength. Got Undefined",
                 });
                 return;
             }
-            this.db.insertMeasurement(measurement.identifier, measurement.aid, measurement.timestamp, measurement.signalStrength)
-            .catch((err) => {
-                callback({
-                    code: grpc.status.CANCELLED,
-                    details: `Error inserting measurement: ${err}`,
+            this.db
+                .insertMeasurement(
+                    measurement.identifier as string,
+                    measurement.aid as number,
+                    measurement.timestamp as number,
+                    measurement.signalStrength as number
+                )
+                .catch((err) => {
+                    callback({
+                        code: grpc.status.CANCELLED,
+                        details: `Error inserting measurement: ${err}`,
+                    });
                 });
-            });
         });
         call.on("end", () => {
             callback(null, {});
         });
     }
-
 
     registerAntennaRoute(
         call: grpc.ServerUnaryCall<
@@ -111,24 +126,23 @@ export class GRPCServer {
         let inputx: number | undefined = call.request.x;
         let inputy: number | undefined = call.request.y;
 
-        if (inputx === undefined || inputy === undefined) {
+        if (typeof inputx !== "number" || typeof inputy !== "number") {
             callback({
                 code: grpc.status.INVALID_ARGUMENT,
                 details: "Expected x and y coordinates",
             });
-        } else {
-            this.db
-                .insertAntenna(inputx, inputy)
-                .then((antenna) => {
-                    callback(null, { aid: antenna.aid });
-                })
-                .catch((err) => {
-                    callback({
-                        code: grpc.status.CANCELLED,
-                        details: `Error inserting antenna: ${err}`,
-                    });
-                });
         }
+        this.db
+            .insertAntenna(inputx as number, inputy as number)
+            .then((antenna) => {
+                callback(null, { aid: antenna.aid });
+            })
+            .catch((err) => {
+                callback({
+                    code: grpc.status.CANCELLED,
+                    details: `Error inserting antenna: ${err}`,
+                });
+            });
     }
 
     //Set up gRPC server with all services

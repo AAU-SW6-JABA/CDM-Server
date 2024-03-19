@@ -77,14 +77,14 @@ export class LocationDatabase {
     }
 
     async insertLocations(
-        imsi: string,
+        identifier: string,
         calctime: number,
         x: number,
         y: number
     ) {
         await this.Prisma.location.create({
             data: {
-                imsi: imsi,
+                identifier: identifier,
                 calctime: calctime,
                 x: x,
                 y: y,
@@ -92,14 +92,14 @@ export class LocationDatabase {
         });
     }
     async insertMeasurement(
-        imsi: string,
+        identifier: string,
         aid: number,
         timestamp: number,
         strengthDBM: number
     ) {
         await this.Prisma.measurement.create({
             data: {
-                imsi: imsi,
+                identifier: identifier,
                 aid: aid,
                 timestamp: timestamp,
                 strengthDBM: strengthDBM,
@@ -107,10 +107,10 @@ export class LocationDatabase {
         });
     }
 
-    async insertCalculations(imsi: string, calctime: number, mid: number) {
+    async insertCalculations(identifier: string, calctime: number, mid: number) {
         await this.Prisma.calculation.create({
             data: {
-                imsi: imsi,
+                identifier: identifier,
                 calctime: calctime,
                 mid: mid,
             },

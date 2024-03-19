@@ -16,29 +16,29 @@ model antennas {
 }
 
 model calculation {
-  imsi     String
+  identifier String
   calctime Float
   mid      Int
 
   measurement measurement @relation(fields: [mid], references: [mid], onDelete: NoAction, onUpdate: NoAction)
-  location    location    @relation(fields: [imsi, calctime], references: [imsi, calctime], onDelete: NoAction, onUpdate: NoAction)
+  location    location    @relation(fields: [identifier, calctime], references: [identifier, calctime], onDelete: NoAction, onUpdate: NoAction)
 
-  @@id([imsi, calctime, mid])
+  @@id([identifier, calctime, mid])
 }
 
 model location {
-  imsi        String
+  identifier        String
   calctime    Float
   x           Float
   y           Float
   calculation calculation[]
 
-  @@id([imsi, calctime])
+  @@id([identifier, calctime])
 }
 
 model measurement {
   mid         Int    @id @default(autoincrement())
-  imsi        String
+  identifier        String
   aid         Int    @db.SmallInt
   timestamp   Float
   strengthDBM Float
