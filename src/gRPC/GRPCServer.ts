@@ -1,20 +1,20 @@
 import * as grpc from "@grpc/grpc-js";
 import * as protoLoader from "@grpc/proto-loader";
 import { LocationDatabase } from "../queries.ts";
-import { ProtoGrpcType } from "../../build/protobuf/cdm_protobuf.ts";
-import { RoutesHandlers } from "../../build/protobuf/cdm_protobuf/Routes.ts";
+import { ProtoGrpcType } from "../../gen/protobuf/cdm_protobuf.ts";
+import { RoutesHandlers } from "../../gen/protobuf/cdm_protobuf/Routes.ts";
 import {
     Empty__Output,
     Empty,
-} from "../../build/protobuf/cdm_protobuf/Empty.ts";
-import { GetAntennasResponse } from "../../build/protobuf/cdm_protobuf/GetAntennasResponse.ts";
-import { GetLocationsRequest__Output } from "../../build/protobuf/cdm_protobuf/GetLocationsRequest.ts";
-import { GetLocationsResponse } from "../../build/protobuf/cdm_protobuf/GetLocationsResponse.ts";
-import { LocationMeasurementsRequest__Output } from "../../build/protobuf/cdm_protobuf/LocationMeasurementsRequest.ts";
-import { LocationMeasurementsResponse } from "../../build/protobuf/cdm_protobuf/LocationMeasurementsResponse.ts";
-import { LogMeasurementRequest__Output } from "../../build/protobuf/cdm_protobuf/LogMeasurementRequest.ts";
-import { RegisterAntennaRequest__Output } from "../../build/protobuf/cdm_protobuf/RegisterAntennaRequest.ts";
-import { RegisterAntennaResponse } from "../../build/protobuf/cdm_protobuf/RegisterAntennaResponse.ts";
+} from "../../gen/protobuf/cdm_protobuf/Empty.ts";
+import { GetAntennasResponse } from "../../gen/protobuf/cdm_protobuf/GetAntennasResponse.ts";
+import { GetLocationsRequest__Output } from "../../gen/protobuf/cdm_protobuf/GetLocationsRequest.ts";
+import { GetLocationsResponse } from "../../gen/protobuf/cdm_protobuf/GetLocationsResponse.ts";
+import { LocationMeasurementsRequest__Output } from "../../gen/protobuf/cdm_protobuf/LocationMeasurementsRequest.ts";
+import { LocationMeasurementsResponse } from "../../gen/protobuf/cdm_protobuf/LocationMeasurementsResponse.ts";
+import { LogMeasurementRequest__Output } from "../../gen/protobuf/cdm_protobuf/LogMeasurementRequest.ts";
+import { RegisterAntennaRequest__Output } from "../../gen/protobuf/cdm_protobuf/RegisterAntennaRequest.ts";
+import { RegisterAntennaResponse } from "../../gen/protobuf/cdm_protobuf/RegisterAntennaResponse.ts";
 
 export class GRPCServer {
     cdm_protobuffer: ProtoGrpcType;

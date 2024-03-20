@@ -3,8 +3,16 @@
 # Submodules
 This project uses the submodule at https://github.com/AAU-SW6-JABA/CDM-ProtocolBuffer
 
-# Initializing the p
-Run the shell script `setup-proto.sh`, which installs dependencies using yarn, and creates ts types for the GRPC protobuffer.
+# Initializing the project
+First install dependencies with yarn:
+```
+yarn install
+```
+
+Then run the setup script which generates gRPC types:
+```
+yarn setup
+```
 
 ## Setting up the PostgreSQL DB:
 
