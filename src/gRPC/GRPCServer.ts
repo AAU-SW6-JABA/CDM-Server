@@ -3,16 +3,14 @@ import * as protoLoader from "@grpc/proto-loader";
 import { LocationDatabase } from "../queries.ts";
 import { ProtoGrpcType } from "../../gen/protobuf/cdm_protobuf.ts";
 import { RoutesHandlers } from "../../gen/protobuf/cdm_protobuf/Routes.ts";
-import {
-    Empty__Output,
-    Empty,
-} from "../../gen/protobuf/cdm_protobuf/Empty.ts";
+import { Empty__Output, Empty } from "../../gen/protobuf/cdm_protobuf/Empty.ts";
 import { GetAntennasResponse } from "../../gen/protobuf/cdm_protobuf/GetAntennasResponse.ts";
 import { GetLocationsRequest__Output } from "../../gen/protobuf/cdm_protobuf/GetLocationsRequest.ts";
 import { GetLocationsResponse } from "../../gen/protobuf/cdm_protobuf/GetLocationsResponse.ts";
 import { LocationMeasurementsRequest__Output } from "../../gen/protobuf/cdm_protobuf/LocationMeasurementsRequest.ts";
 import { LocationMeasurementsResponse } from "../../gen/protobuf/cdm_protobuf/LocationMeasurementsResponse.ts";
 import { LogMeasurementRequest__Output } from "../../gen/protobuf/cdm_protobuf/LogMeasurementRequest.ts";
+import { LogMeasurementsRequest__Output } from "../../gen/protobuf/cdm_protobuf/LogMeasurementsRequest.ts";
 import { RegisterAntennaRequest__Output } from "../../gen/protobuf/cdm_protobuf/RegisterAntennaRequest.ts";
 import { RegisterAntennaResponse } from "../../gen/protobuf/cdm_protobuf/RegisterAntennaResponse.ts";
 
@@ -52,20 +50,21 @@ export class GRPCServer {
         ): void {
             throw new Error("Function not implemented.");
         },
-        GetLocationsRoute: function (
+        GetLocationsRoute: (
             call: grpc.ServerUnaryCall<
                 GetLocationsRequest__Output,
                 GetLocationsResponse
             >,
             callback: grpc.sendUnaryData<GetLocationsResponse>
-        ): void {
-            throw new Error("Function not implemented.");
-        },
+        ) => this.getLocationsRoute(call, callback),
+
+        LogMeasurementsRoute: (
+            call: grpc.ServerUnaryCall<LogMeasurementsRequest__Output, Empty>,
+            callback: grpc.sendUnaryData<Empty>
+        ) => this.logMeasurementsRoute(call, callback),
+
         LogMeasurementRoute: (
-            call: grpc.ServerReadableStream<
-                LogMeasurementRequest__Output,
-                Empty
-            >,
+            call: grpc.ServerUnaryCall<LogMeasurementRequest__Output, Empty>,
             callback: grpc.sendUnaryData<Empty>
         ) => this.logMeasurementRoute(call, callback),
 
@@ -79,41 +78,55 @@ export class GRPCServer {
         ) => this.registerAntennaRoute(call, callback),
     };
 
+    getLocationsRoute(
+        call: grpc.ServerUnaryCall<
+            GetLocationsRequest__Output,
+            GetLocationsResponse
+        >,
+        callback: grpc.sendUnaryData<GetLocationsResponse>
+    ): void {
+        throw new Error("Function not implemented.");
+    }
+
+    logMeasurementsRoute(
+        call: grpc.ServerUnaryCall<LogMeasurementsRequest__Output, Empty>,
+        callback: grpc.sendUnaryData<Empty>
+    ) {
+        throw new Error("Function not implemented.");
+    }
+
     logMeasurementRoute(
-        call: grpc.ServerReadableStream<LogMeasurementRequest__Output, Empty>,
+        call: grpc.ServerUnaryCall<LogMeasurementRequest__Output, Empty>,
         callback: grpc.sendUnaryData<Empty>
     ): void {
-        call.on("data", (measurement: LogMeasurementRequest__Output) => {
-            if (
-                typeof measurement.identifier !== "string" ||
-                typeof measurement.aid !== "number" ||
-                typeof measurement.timestamp !== "number" ||
-                typeof measurement.signalStrength !== "number"
-            ) {
+        let measurement = call.request;
+        if (
+            typeof measurement.identifier !== "string" ||
+            typeof measurement.aid !== "number" ||
+            typeof measurement.timestamp !== "number" ||
+            typeof measurement.signalStrength !== "number"
+        ) {
+            callback({
+                code: grpc.status.INVALID_ARGUMENT,
+                details:
+                    "Expected identifier, aid, timestamp, and signalStrength. Got Undefined",
+            });
+            return;
+        }
+        this.db
+            .insertMeasurement(
+                measurement.identifier as string,
+                measurement.aid as number,
+                measurement.timestamp as number,
+                measurement.signalStrength as number
+            )
+            .catch((err) => {
                 callback({
-                    code: grpc.status.INVALID_ARGUMENT,
-                    details:
-                        "Expected identifier, aid, timestamp, and signalStrength. Got Undefined",
+                    code: grpc.status.CANCELLED,
+                    details: `Error inserting measurement: ${err}`,
                 });
-                return;
-            }
-            this.db
-                .insertMeasurement(
-                    measurement.identifier as string,
-                    measurement.aid as number,
-                    measurement.timestamp as number,
-                    measurement.signalStrength as number
-                )
-                .catch((err) => {
-                    callback({
-                        code: grpc.status.CANCELLED,
-                        details: `Error inserting measurement: ${err}`,
-                    });
-                });
-        });
-        call.on("end", () => {
-            callback(null, {});
-        });
+            });
+        callback(null, {});
     }
 
     registerAntennaRoute(
