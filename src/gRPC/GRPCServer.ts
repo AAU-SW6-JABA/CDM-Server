@@ -84,7 +84,7 @@ export class GRPCServer {
             callback: grpc.sendUnaryData<RegisterAntennaResponse>
         ) => this.registerAntennaRoute(call, callback),
     };
-    getantennaRoute(
+    getAntennasRoute(
         call: grpc.ServerUnaryCall<Empty__Output, GetAntennasResponse>,
         callback: grpc.sendUnaryData<GetAntennasResponse>
     ): void {
