@@ -94,7 +94,7 @@ export class GRPCServer {
             if (response.status == grpc.status.CANCELLED) {
                 callback({
                     code: grpc.status.CANCELLED,
-                    details: `Failed converting antenna(s) to antenna(s) response: ${response.failingAntennas}`,
+                    details: `Failed converting the following antenna(s) to gRPC antenna response: ${response.failingAntennas}`,
                 });
             } else if (response.status == grpc.status.OK) {
                 callback(null, response.antennasArray)
