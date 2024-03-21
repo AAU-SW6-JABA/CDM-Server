@@ -17,7 +17,7 @@ import { LogMeasurementsRequest__Output } from "../../gen/protobuf/cdm_protobuf/
 import { RegisterAntennaRequest__Output } from "../../gen/protobuf/cdm_protobuf/RegisterAntennaRequest.ts";
 import { RegisterAntennaResponse } from "../../gen/protobuf/cdm_protobuf/RegisterAntennaResponse.ts";
 import type {
-    antennas,
+    antennas, location,
 } from "@prisma/client";
 
 export class GRPCServer {
@@ -140,9 +140,52 @@ export class GRPCServer {
         >,
         callback: grpc.sendUnaryData<GetLocationsResponse>
     ): void {
-        throw new Error("Function not implemented.");
-
+        let request = call.request;
+        if (typeof request.method !== "number") {
+            callback({
+                code: grpc.status.INVALID_ARGUMENT,
+                details: "Expected method",
+            });
+            return;
+        }
+        this.db.getLocation(request.method, request.identifier, request.timeinterval, request.nRecent).then((locations) => {
+            let response = this.convertLocationObjectToGetLocationsResponse(locations);
+            if (response.status == grpc.status.CANCELLED) {
+                callback({
+                    code: grpc.status.CANCELLED,
+                    details: `Failed converting the following location(s) to gRPC location response: ${response.failingLocations}`,
+                });
+            } else if (response.status == grpc.status.OK) {
+                callback(null, response.locationsArray)
+            }
+        });
     }
+    convertLocationObjectToGetLocationsResponse(location: location[]): { status: grpc.status.OK, locationsArray: GetLocationsResponse } | { status: grpc.status.CANCELLED, failingLocations: location[] } {
+        let locationObject: GetLocationsResponse = {};
+        locationObject.location = [];
+        let failingLocations = [];
+        let failed = false;
+
+        for (const loc of location) {
+            if (!loc.identifier || !loc.calctime || !loc.x || !loc.y) {
+                failingLocations.push(loc);
+                failed = true;
+            } else {
+                locationObject.location.push({ x: loc.x, y: loc.y, calctime: loc.calctime });
+            }
+        }
+        if (failed) {
+            return {
+                status: grpc.status.CANCELLED,
+                failingLocations: location
+            }
+        }
+        return {
+            status: grpc.status.OK,
+            locationsArray: locationObject
+        }
+    }
+
 
     logMeasurementsRoute(
         call: grpc.ServerUnaryCall<LogMeasurementsRequest__Output, Empty>,
