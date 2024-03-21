@@ -1,15 +1,19 @@
 # Crowd-Density-Management
 
 # Submodules
+
 This project uses the submodule at https://github.com/AAU-SW6-JABA/CDM-ProtocolBuffer
 
 # Initializing the project
+
 First install dependencies with yarn:
+
 ```
 yarn install
 ```
 
 Then run the setup script which generates gRPC types:
+
 ```
 yarn setup
 ```
@@ -25,7 +29,9 @@ docker-compose -f postgresqldb-docker-compose.yml up -d
 ```
 
 ## Using Prisma for types in DB:
+
 A "schema.prisma" file can be found in the prisma folder in the file the structure of the database and types are illustrated. If any changes are made inside the file, run the following command to create and apply database migrations based on your schema:
+
 ```
 yarn run prisma migrate dev --name init
 ```
@@ -34,4 +40,4 @@ In order to create a client that can interact with the database the following co
 
 ```
 yarn run prisma generate
-````
+```
