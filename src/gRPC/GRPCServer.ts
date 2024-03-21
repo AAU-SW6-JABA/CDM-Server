@@ -3,7 +3,10 @@ import * as protoLoader from "@grpc/proto-loader";
 import { LocationDatabase } from "../queries.ts";
 import { ProtoGrpcType } from "../../gen/protobuf/cdm_protobuf.ts";
 import { RoutesHandlers } from "../../gen/protobuf/cdm_protobuf/Routes.ts";
-import { Empty__Output, Empty } from "../../gen/protobuf/cdm_protobuf/Empty.ts";
+import {
+    Empty__Output,
+    Empty,
+} from "../../gen/protobuf/cdm_protobuf/Empty.ts";
 import { GetAntennasResponse } from "../../gen/protobuf/cdm_protobuf/GetAntennasResponse.ts";
 import { GetLocationsRequest__Output } from "../../gen/protobuf/cdm_protobuf/GetLocationsRequest.ts";
 import { GetLocationsResponse } from "../../gen/protobuf/cdm_protobuf/GetLocationsResponse.ts";
@@ -13,6 +16,9 @@ import { LogMeasurementRequest__Output } from "../../gen/protobuf/cdm_protobuf/L
 import { LogMeasurementsRequest__Output } from "../../gen/protobuf/cdm_protobuf/LogMeasurementsRequest.ts";
 import { RegisterAntennaRequest__Output } from "../../gen/protobuf/cdm_protobuf/RegisterAntennaRequest.ts";
 import { RegisterAntennaResponse } from "../../gen/protobuf/cdm_protobuf/RegisterAntennaResponse.ts";
+import type {
+    antennas,
+} from "@prisma/client";
 
 export class GRPCServer {
     cdm_protobuffer: ProtoGrpcType;
@@ -35,12 +41,13 @@ export class GRPCServer {
     }
 
     routeHandlers: RoutesHandlers = {
-        GetAntennasRoute: function (
-            call: grpc.ServerUnaryCall<Empty__Output, GetAntennasResponse>,
+        GetAntennasRoute: (
+            call: grpc.ServerUnaryCall<
+                Empty__Output,
+                GetAntennasResponse>,
             callback: grpc.sendUnaryData<GetAntennasResponse>
-        ): void {
-            throw new Error("Function not implemented.");
-        },
+        ) => this.getAntennasRoute(call, callback),
+
         GetLocationMeasurementsRoute: function (
             call: grpc.ServerUnaryCall<
                 LocationMeasurementsRequest__Output,
@@ -77,6 +84,54 @@ export class GRPCServer {
             callback: grpc.sendUnaryData<RegisterAntennaResponse>
         ) => this.registerAntennaRoute(call, callback),
     };
+    getAntennasRoute(
+        call: grpc.ServerUnaryCall<Empty__Output, GetAntennasResponse>,
+        callback: grpc.sendUnaryData<GetAntennasResponse>
+    ): void {
+        this.db.getAllAntennas().then((antenna) => {
+            let response = this.convertAntennaObjectToGetAntennasResponse(antenna);
+
+            if (response.status == grpc.status.CANCELLED) {
+                callback({
+                    code: grpc.status.CANCELLED,
+                    details: `Failed converting the following antenna(s) to gRPC antenna response: ${response.failingAntennas}`,
+                });
+            } else if (response.status == grpc.status.OK) {
+                callback(null, response.antennasArray)
+            }
+        });
+    }
+
+    convertAntennaObjectToGetAntennasResponse(antennas: antennas[]): {
+        status: grpc.status.OK, antennasArray: GetAntennasResponse
+    } |
+    { status: grpc.status.CANCELLED, failingAntennas: antennas[] } {
+        let antennaObject: GetAntennasResponse = {};
+        antennaObject.antenna = [];
+        let failingAntennas = [];
+        let failed = false;
+
+        for (const antenna of antennas) {
+            if (!antenna.aid ||
+                !antenna.x ||
+                !antenna.y) {
+                failingAntennas.push(antenna);
+                failed = true;
+            } else {
+                antennaObject.antenna.push({ aid: antenna.aid, x: antenna.x, y: antenna.y })
+            }
+        }
+        if (failed) {
+            return {
+                status: grpc.status.CANCELLED,
+                failingAntennas: antennas
+            }
+        }
+        return {
+            status: grpc.status.OK,
+            antennasArray: antennaObject
+        }
+    };
 
     getLocationsRoute(
         call: grpc.ServerUnaryCall<
@@ -86,6 +141,7 @@ export class GRPCServer {
         callback: grpc.sendUnaryData<GetLocationsResponse>
     ): void {
         throw new Error("Function not implemented.");
+
     }
 
     logMeasurementsRoute(
