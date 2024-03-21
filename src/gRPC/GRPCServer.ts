@@ -3,7 +3,10 @@ import * as protoLoader from "@grpc/proto-loader";
 import { LocationDatabase } from "../queries.ts";
 import { ProtoGrpcType } from "../../gen/protobuf/cdm_protobuf.ts";
 import { RoutesHandlers } from "../../gen/protobuf/cdm_protobuf/Routes.ts";
-import { Empty__Output, Empty } from "../../gen/protobuf/cdm_protobuf/Empty.ts";
+import {
+    Empty__Output,
+    Empty,
+} from "../../gen/protobuf/cdm_protobuf/Empty.ts";
 import { GetAntennasResponse } from "../../gen/protobuf/cdm_protobuf/GetAntennasResponse.ts";
 import { GetLocationsRequest__Output } from "../../gen/protobuf/cdm_protobuf/GetLocationsRequest.ts";
 import { GetLocationsResponse } from "../../gen/protobuf/cdm_protobuf/GetLocationsResponse.ts";
@@ -13,6 +16,9 @@ import { LogMeasurementRequest__Output } from "../../gen/protobuf/cdm_protobuf/L
 import { LogMeasurementsRequest__Output } from "../../gen/protobuf/cdm_protobuf/LogMeasurementsRequest.ts";
 import { RegisterAntennaRequest__Output } from "../../gen/protobuf/cdm_protobuf/RegisterAntennaRequest.ts";
 import { RegisterAntennaResponse } from "../../gen/protobuf/cdm_protobuf/RegisterAntennaResponse.ts";
+import type {
+    antennas,
+} from "@prisma/client";
 
 export class GRPCServer {
     cdm_protobuffer: ProtoGrpcType;
@@ -35,12 +41,13 @@ export class GRPCServer {
     }
 
     routeHandlers: RoutesHandlers = {
-        GetAntennasRoute: function (
-            call: grpc.ServerUnaryCall<Empty__Output, GetAntennasResponse>,
+        GetAntennasRoute: (
+            call: grpc.ServerUnaryCall<
+                Empty__Output,
+                GetAntennasResponse>,
             callback: grpc.sendUnaryData<GetAntennasResponse>
-        ): void {
-            throw new Error("Function not implemented.");
-        },
+        ) => this.getantennaRoute(call, callback),
+
         GetLocationMeasurementsRoute: function (
             call: grpc.ServerUnaryCall<
                 LocationMeasurementsRequest__Output,
@@ -76,6 +83,49 @@ export class GRPCServer {
             >,
             callback: grpc.sendUnaryData<RegisterAntennaResponse>
         ) => this.registerAntennaRoute(call, callback),
+    };
+    getantennaRoute(
+        call: grpc.ServerUnaryCall<Empty__Output, GetAntennasResponse>,
+        callback: grpc.sendUnaryData<GetAntennasResponse>
+    ): void {
+        this.db.getAllAntennas().then((antenna) => {
+            let response = this.convertAntennaObjectToGetAntennasResponse(antenna);
+            if (response.status == 'fail') {
+                callback({
+                    code: grpc.status.CANCELLED,
+                    details: `Error inserting antenna: ${response.failingAntennas}`,
+                });
+            } else if (response.status == `success`) {
+                callback(null, response.antennasArray)
+            }
+        });
+    }
+
+    convertAntennaObjectToGetAntennasResponse(antennas: antennas[]): {
+        status: "success", antennasArray: GetAntennasResponse
+    } |
+    { status: "fail", failingAntennas: antennas } {
+
+        let antennaObject: GetAntennasResponse = {};
+        antennaObject.antenna = [];
+        let size = antennas.length;
+        for (const antenna of antennas) {
+            if (!antenna.aid ||
+                !antenna.x ||
+                !antenna.y) {
+                return {
+                    status: "fail",
+                    failingAntennas: antenna
+                }
+            }
+            antennaObject.antenna.push({ aid: antenna.aid, x: antenna.x, y: antenna.y })
+
+        }
+
+        return {
+            status: "success",
+            antennasArray: antennaObject
+        }
     };
 
     getLocationsRoute(

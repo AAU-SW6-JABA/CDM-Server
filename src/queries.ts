@@ -13,6 +13,60 @@ export class LocationDatabase {
         this.Prisma = new PrismaClient();
     }
 
+    async getLocation(method: number,
+        identifier?: string,
+        timeinterval?: number,
+        n_recent?: number):
+        Promise<location[] | string> {
+        switch (method) {
+            //Getting Location/s using Identifier.
+            case 0: {
+                if (!identifier) {
+                    return "An identifer is requried"
+                }
+                let query: Prisma.locationFindManyArgs = {};
+
+                query.where = {
+                    identifier: identifier
+                }
+
+                return await this.Prisma.location.findMany(query);
+            }
+            //Gettting location/s using timestamp in unix time.
+            case 1: {
+                if (!timeinterval) {
+                    return "A time interval is required"
+                }
+                let query: Prisma.locationFindManyArgs = {};
+                const endTime = Date.now();
+                query.where = {
+                    calctime: {
+                        gte: timeinterval, //Greater than or equal to
+                        lte: endTime, //Less than or equal to
+                    },
+                };
+                return await this.Prisma.location.findMany(query);
+            }
+            //Getting n most recent location/s  
+            case 2: {
+                if (!n_recent) {
+                    return "The number of recent locations is requried"
+                }
+                return await this.Prisma.location.findMany({
+                    orderBy: {
+                        calctime: 'desc',
+                    },
+                    take: n_recent,
+                })
+            }
+            //Gettting all location
+            case 3: {
+                return await this.Prisma.location.findMany();
+            }
+        }
+        return "Method is requried"
+    }
+
     async getLocationsUsingTime(
         startTime: number,
         endTime: number
