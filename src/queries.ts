@@ -5,6 +5,7 @@ import type {
     calculation,
     measurement,
 } from "@prisma/client";
+import { errorMonitor } from "events";
 
 export class LocationDatabase {
     public Prisma: PrismaClient;
@@ -17,12 +18,12 @@ export class LocationDatabase {
         identifier?: string,
         timeinterval?: number,
         n_recent?: number):
-        Promise<location[] | string> {
+        Promise<location[]> {
         switch (method) {
             //Getting Location/s using Identifier.
             case 0: {
                 if (!identifier) {
-                    return "An identifer is requried"
+                    throw new Error("An identifer is requried")
                 }
                 let query: Prisma.locationFindManyArgs = {};
 
@@ -35,7 +36,7 @@ export class LocationDatabase {
             //Gettting location/s using timestamp in unix time.
             case 1: {
                 if (!timeinterval) {
-                    return "A time interval is required"
+                    throw new Error("A time interval is required")
                 }
                 let query: Prisma.locationFindManyArgs = {};
                 const endTime = Date.now();
@@ -50,7 +51,7 @@ export class LocationDatabase {
             //Getting n most recent location/s  
             case 2: {
                 if (!n_recent) {
-                    return "The number of recent locations is requried"
+                    throw new Error("The number of recent locations is requried");
                 }
                 return await this.Prisma.location.findMany({
                     orderBy: {
@@ -64,28 +65,7 @@ export class LocationDatabase {
                 return await this.Prisma.location.findMany();
             }
         }
-        return "Method is requried"
-    }
-
-    async getLocationsUsingTime(
-        startTime: number,
-        endTime: number
-    ): Promise<location[]> {
-        let query: Prisma.locationFindManyArgs = {};
-
-        if (startTime && endTime) {
-            query.where = {
-                calctime: {
-                    gte: startTime, //Greater than or equal to
-                    lte: endTime, //Less than or equal to
-                },
-            };
-        }
-
-        return await this.Prisma.location.findMany(query);
-    }
-    async getAllLocations(): Promise<location[]> {
-        return await this.Prisma.location.findMany();
+        throw new Error("Method is requried")
     }
 
     async getAllMeasurements(): Promise<measurement[]> {
