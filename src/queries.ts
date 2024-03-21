@@ -5,7 +5,6 @@ import type {
     calculation,
     measurement,
 } from "@prisma/client";
-import { errorMonitor } from "events";
 
 export class LocationDatabase {
     public Prisma: PrismaClient;
