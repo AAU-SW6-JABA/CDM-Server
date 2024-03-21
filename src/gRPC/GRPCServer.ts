@@ -94,7 +94,7 @@ export class GRPCServer {
             if (response.status == grpc.status.CANCELLED) {
                 callback({
                     code: grpc.status.CANCELLED,
-                    details: `Error inserting antenna(s): ${response.failingAntennas}`,
+                    details: `Failed converting antenna(s) to antenna(s) response: ${response.failingAntennas}`,
                 });
             } else if (response.status == grpc.status.OK) {
                 callback(null, response.antennasArray)
@@ -141,6 +141,7 @@ export class GRPCServer {
         callback: grpc.sendUnaryData<GetLocationsResponse>
     ): void {
         throw new Error("Function not implemented.");
+
     }
 
     logMeasurementsRoute(
