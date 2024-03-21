@@ -104,24 +104,28 @@ export class GRPCServer {
     convertAntennaObjectToGetAntennasResponse(antennas: antennas[]): {
         status: "success", antennasArray: GetAntennasResponse
     } |
-    { status: "fail", failingAntennas: antennas } {
-
+    { status: "fail", failingAntennas: antennas[] } {
         let antennaObject: GetAntennasResponse = {};
         antennaObject.antenna = [];
-        let size = antennas.length;
+        let failingAntennas = [];
+        let failed = false;
+
         for (const antenna of antennas) {
             if (!antenna.aid ||
                 !antenna.x ||
                 !antenna.y) {
-                return {
-                    status: "fail",
-                    failingAntennas: antenna
-                }
+                failingAntennas.push(antenna);
+                failed = true;
+            } else {
+                antennaObject.antenna.push({ aid: antenna.aid, x: antenna.x, y: antenna.y })
             }
-            antennaObject.antenna.push({ aid: antenna.aid, x: antenna.x, y: antenna.y })
-
         }
-
+        if (failed) {
+            return {
+                status: "fail",
+                failingAntennas: antennas
+            }
+        }
         return {
             status: "success",
             antennasArray: antennaObject
