@@ -93,7 +93,7 @@ export class GRPCServer {
             if (response.status == 'fail') {
                 callback({
                     code: grpc.status.CANCELLED,
-                    details: `Error inserting antenna: ${response.failingAntennas}`,
+                    details: `Error inserting antenna(s): ${response.failingAntennas}`,
                 });
             } else if (response.status == `success`) {
                 callback(null, response.antennasArray)
