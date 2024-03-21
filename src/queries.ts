@@ -24,7 +24,7 @@ export class LocationDatabase {
                 if (!identifier) {
                     throw new Error("An identifer is requried")
                 }
-                let query: Prisma.locationFindManyArgs = {};
+                const query: Prisma.locationFindManyArgs = {};
 
                 query.where = {
                     identifier: identifier
@@ -37,7 +37,7 @@ export class LocationDatabase {
                 if (!timeinterval) {
                     throw new Error("A time interval is required")
                 }
-                let query: Prisma.locationFindManyArgs = {};
+                const query: Prisma.locationFindManyArgs = {};
                 const endTime = Date.now();
                 query.where = {
                     calctime: {
@@ -75,7 +75,7 @@ export class LocationDatabase {
         startTime: number,
         endTime: number
     ): Promise<measurement[]> {
-        let query: Prisma.measurementFindFirstArgs = {};
+        const query: Prisma.measurementFindFirstArgs = {};
 
         if (startTime && endTime) {
             query.where = {
@@ -95,7 +95,7 @@ export class LocationDatabase {
     async getAntennasUsingAid(
         aid: number
     ): Promise<antennas[]> {
-        let query: Prisma.antennasFindManyArgs = {};
+        const query: Prisma.antennasFindManyArgs = {};
 
         if (aid) {
             query.where = {

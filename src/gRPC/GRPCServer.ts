@@ -34,7 +34,7 @@ export class GRPCServer {
     //Load the protocol buffer
     setupProto(): ProtoGrpcType {
         const packageDefinition = protoLoader.loadSync(this.protoPath);
-        let cdm_protobuffer = grpc.loadPackageDefinition(
+        const cdm_protobuffer = grpc.loadPackageDefinition(
             packageDefinition
         ) as unknown as ProtoGrpcType;
         return cdm_protobuffer;
@@ -89,7 +89,7 @@ export class GRPCServer {
         callback: grpc.sendUnaryData<GetAntennasResponse>
     ): void {
         this.db.getAllAntennas().then((antenna) => {
-            let response = this.convertAntennaObjectToGetAntennasResponse(antenna);
+            const response = this.convertAntennaObjectToGetAntennasResponse(antenna);
 
             if (response.status == grpc.status.CANCELLED) {
                 callback({
@@ -106,9 +106,9 @@ export class GRPCServer {
         status: grpc.status.OK, antennasArray: GetAntennasResponse
     } |
     { status: grpc.status.CANCELLED, failingAntennas: antennas[] } {
-        let antennaObject: GetAntennasResponse = {};
+        const antennaObject: GetAntennasResponse = {};
         antennaObject.antenna = [];
-        let failingAntennas = [];
+        const failingAntennas = [];
         let failed = false;
 
         for (const antenna of antennas) {
@@ -131,7 +131,7 @@ export class GRPCServer {
             status: grpc.status.OK,
             antennasArray: antennaObject
         }
-    };
+    }
 
     getLocationsRoute(
         call: grpc.ServerUnaryCall<
@@ -140,7 +140,7 @@ export class GRPCServer {
         >,
         callback: grpc.sendUnaryData<GetLocationsResponse>
     ): void {
-        let request = call.request;
+        const request = call.request;
         if (typeof request.method !== "number") {
             callback({
                 code: grpc.status.INVALID_ARGUMENT,
@@ -149,7 +149,7 @@ export class GRPCServer {
             return;
         }
         this.db.getLocation(request.method, request.identifier, request.timeinterval, request.nRecent).then((locations) => {
-            let response = this.convertLocationObjectToGetLocationsResponse(locations);
+            const response = this.convertLocationObjectToGetLocationsResponse(locations);
             if (response.status == grpc.status.CANCELLED) {
                 callback({
                     code: grpc.status.CANCELLED,
@@ -161,9 +161,9 @@ export class GRPCServer {
         });
     }
     convertLocationObjectToGetLocationsResponse(location: location[]): { status: grpc.status.OK, locationsArray: GetLocationsResponse } | { status: grpc.status.CANCELLED, failingLocations: location[] } {
-        let locationObject: GetLocationsResponse = {};
+        const locationObject: GetLocationsResponse = {};
         locationObject.location = [];
-        let failingLocations = [];
+        const failingLocations = [];
         let failed = false;
 
         for (const loc of location) {
@@ -198,7 +198,7 @@ export class GRPCServer {
         call: grpc.ServerUnaryCall<LogMeasurementRequest__Output, Empty>,
         callback: grpc.sendUnaryData<Empty>
     ): void {
-        let measurement = call.request;
+        const measurement = call.request;
         if (
             typeof measurement.identifier !== "string" ||
             typeof measurement.aid !== "number" ||
@@ -214,10 +214,10 @@ export class GRPCServer {
         }
         this.db
             .insertMeasurement(
-                measurement.identifier as string,
-                measurement.aid as number,
-                measurement.timestamp as number,
-                measurement.signalStrength as number
+                measurement.identifier,
+                measurement.aid,
+                measurement.timestamp,
+                measurement.signalStrength
             )
             .catch((err) => {
                 callback({
@@ -235,8 +235,8 @@ export class GRPCServer {
         >,
         callback: grpc.sendUnaryData<RegisterAntennaResponse>
     ): void {
-        let inputx: number | undefined = call.request.x;
-        let inputy: number | undefined = call.request.y;
+        const inputx: number | undefined = call.request.x;
+        const inputy: number | undefined = call.request.y;
 
         if (typeof inputx !== "number" || typeof inputy !== "number") {
             callback({
