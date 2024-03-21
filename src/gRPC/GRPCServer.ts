@@ -90,21 +90,22 @@ export class GRPCServer {
     ): void {
         this.db.getAllAntennas().then((antenna) => {
             let response = this.convertAntennaObjectToGetAntennasResponse(antenna);
-            if (response.status == 'fail') {
+
+            if (response.status == grpc.status.CANCELLED) {
                 callback({
                     code: grpc.status.CANCELLED,
                     details: `Error inserting antenna(s): ${response.failingAntennas}`,
                 });
-            } else if (response.status == `success`) {
+            } else if (response.status == grpc.status.OK) {
                 callback(null, response.antennasArray)
             }
         });
     }
 
     convertAntennaObjectToGetAntennasResponse(antennas: antennas[]): {
-        status: "success", antennasArray: GetAntennasResponse
+        status: grpc.status.OK, antennasArray: GetAntennasResponse
     } |
-    { status: "fail", failingAntennas: antennas[] } {
+    { status: grpc.status.CANCELLED, failingAntennas: antennas[] } {
         let antennaObject: GetAntennasResponse = {};
         antennaObject.antenna = [];
         let failingAntennas = [];
@@ -122,12 +123,12 @@ export class GRPCServer {
         }
         if (failed) {
             return {
-                status: "fail",
+                status: grpc.status.CANCELLED,
                 failingAntennas: antennas
             }
         }
         return {
-            status: "success",
+            status: grpc.status.OK,
             antennasArray: antennaObject
         }
     };
