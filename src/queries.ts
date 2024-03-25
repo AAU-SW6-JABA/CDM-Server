@@ -113,7 +113,7 @@ export class LocationDatabase {
 	async getMeasurementsBasedOnCalculations(
 		identifer: string,
 		calctime: number,
-	) {
+	): Promise<(measurement | null)[]> {
 		//Finding all measurements based on calculations
 		const query: Prisma.calculationFindManyArgs = {};
 		query.where = {
@@ -131,6 +131,7 @@ export class LocationDatabase {
 			});
 			measurements.push(measurement);
 		}
+		return measurements;
 	}
 
 	async insertLocations(
