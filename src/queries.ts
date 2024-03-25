@@ -110,6 +110,17 @@ export class LocationDatabase {
 		return await this.Prisma.antennas.findMany();
 	}
 
+	async getMeasurementsBasedOnLocation(
+		identifer: string,
+		calctime: number,
+	): Promise<location[]> {
+		//Finding all measurements based on calculations
+		return this.Prisma.location.findMany({
+			where: { identifier: identifer, calctime: calctime },
+			include: { calculation: true },
+		});
+	}
+
 	async insertLocations(
 		identifier: string,
 		calctime: number,
