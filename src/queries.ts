@@ -110,6 +110,29 @@ export class LocationDatabase {
 		return await this.Prisma.antennas.findMany();
 	}
 
+	async getMeasurementsBasedOnCalculations(
+		identifer: string,
+		calctime: number,
+	) {
+		//Finding all measurements based on calculations
+		const query: Prisma.calculationFindManyArgs = {};
+		query.where = {
+			identifier: identifer,
+			calctime: calctime,
+		};
+		const calculations = await this.Prisma.calculation.findMany(query);
+		const measurements: (measurement | null)[] = [];
+
+		for (const calculation of calculations) {
+			const measurement = await this.Prisma.measurement.findFirst({
+				where: {
+					mid: calculation.mid,
+				},
+			});
+			measurements.push(measurement);
+		}
+	}
+
 	async insertLocations(
 		identifier: string,
 		calctime: number,
