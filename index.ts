@@ -7,22 +7,22 @@ dotenv.config();
 
 // Start the gRPC server
 const server = new GRPCServer(
-    "CDM-ProtocolBuffer/cdm_protobuf.proto"
+	"CDM-ProtocolBuffer/cdm_protobuf.proto",
 ).getServer();
 server.bindAsync(
-    `localhost:${process.env.PORT}`,
-    grpc.ServerCredentials.createInsecure(),
-    (err, port) => {
-        if (err) {
-            console.log(`Failed to start server with error: ${err.message}`);
-            return;
-        }
+	`localhost:${process.env.PORT}`,
+	grpc.ServerCredentials.createInsecure(),
+	(err, port) => {
+		if (err) {
+			console.log(`Failed to start server with error: ${err.message}`);
+			return;
+		}
 
-        // Start gRPC server
-        server;
-        console.log(`Server running at http://localhost:${port}`);
+		// Start gRPC server
+		server;
+		console.log(`Server running at http://localhost:${port}`);
 
-        // Setup Cron jobs
-        setupCronSchedule();
-    }
+		// Setup Cron jobs
+		setupCronSchedule();
+	},
 );

@@ -7,7 +7,7 @@ import type {
 } from "@prisma/client";
 
 class CDMDatabase {
-    public Prisma: PrismaClient;
+	public Prisma: PrismaClient;
 
 	constructor() {
 		this.Prisma = new PrismaClient();
@@ -74,30 +74,30 @@ class CDMDatabase {
 		return await this.Prisma.measurement.findMany();
 	}
 
-    async getNNewestMeasurements(n: number = 1): Promise<measurement[][]> {
-        const identifiers = await this.Prisma.measurement.findMany({
-            select: {
-                identifier: true,
-            },
-            distinct: ["identifier"],
-        });
+	async getNNewestMeasurements(n: number = 1): Promise<measurement[][]> {
+		const identifiers = await this.Prisma.measurement.findMany({
+			select: {
+				identifier: true,
+			},
+			distinct: ["identifier"],
+		});
 
-        const promises = identifiers.map((identifier) =>
-            this.Prisma.measurement.findMany({
-                where: {
-                    identifier: identifier.identifier,
-                },
-                orderBy: {
-                    timestamp: "desc",
-                },
-                take: n,
-            })
-        );
+		const promises = identifiers.map((identifier) =>
+			this.Prisma.measurement.findMany({
+				where: {
+					identifier: identifier.identifier,
+				},
+				orderBy: {
+					timestamp: "desc",
+				},
+				take: n,
+			}),
+		);
 
-        const measurements = Promise.all(promises);
+		const measurements = Promise.all(promises);
 
-        return measurements;
-    }
+		return measurements;
+	}
 
 	async getMeasurementsBetweenTimestamps(
 		startTime: number,
@@ -145,7 +145,6 @@ class CDMDatabase {
 			include: { calculation: true },
 		});
 	}
-
 
 	async insertLocations(
 		identifier: string,

@@ -17,8 +17,8 @@
 		"reflect-metadata": "^0.2.1",
 		"typescript": "^5.4.3",
 		"vite-node": "^1.4.0",
-        "node-cron": "^3.0.3",
-        "zod": "^3.22.4"
+		"node-cron": "^3.0.3",
+		"zod": "^3.22.4"
 	},
 	"devDependencies": {
 		"@types/eslint__js": "^8.42.3",
