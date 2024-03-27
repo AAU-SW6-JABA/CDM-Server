@@ -1,8 +1,8 @@
 import { schedule } from "node-cron";
 
-import config from "../config";
-import cdm_db from "./queries";
-import { location, measurement } from "@prisma/client";
+import config from "../config.ts";
+import cdm_db from "./queries.ts";
+import { measurement } from "@prisma/client";
 
 /**
  * List of cron jobs to be added
@@ -15,22 +15,36 @@ const cronJobs: { interval: string; jobFunction: () => void }[] = [
 ];
 
 /**
- * Filter function for the cron jobs
+ * Function for setting up cron schedules
  */
-function filter(): void {
-	// String type should be corrected to be a Location array
-	// This function would look something like:
-	// 1. Get data and filter based on config
-	// 2. Call calculation function on input
-	// 3. Insert newly calculated locations into database
+export default function setupCronSchedule() {
+	cronJobs.forEach((job) => {
+		schedule(job.interval, job.jobFunction);
+	});
+}
+
+/**
+ * Functions for the cron jobs
+ */
+function calculateLocations() {
+	console.log("moin");
+
+	const data: measurement[][] = gaterMeasurementData();
+	console.log(`Got measurements for ${data.length} locations`);
 }
 
 function gaterMeasurementData(): measurement[][] {
 	switch (config.filter.method) {
 		case "none":
-			cdm_db.getNNewestMeasurements().then((measurements) => {
-				return measurements;
-			});
+			cdm_db
+				.getNNewestMeasurements()
+				.then((measurements: measurement[][]) => {
+					return measurements;
+				})
+				.catch((error: Error) => {
+					console.error(error);
+					return [];
+				});
 			break;
 
 		case "NAverage":
@@ -47,27 +61,13 @@ function gaterMeasurementData(): measurement[][] {
 					});
 
 					return measurementsPrIdentifier; // Change return to filtered data
+				})
+				.catch((error: Error) => {
+					console.error(error);
+					return [];
 				});
 			break;
 	}
 
 	return [];
-}
-
-/**
- * Functions for the cron jobs
- */
-function calculateLocations() {
-	const data: measurement[][] = gaterMeasurementData();
-
-	console.log("Calculated locations");
-}
-
-/**
- * Function for setting up cron schedules
- */
-export default function setupCronSchedule() {
-	cronJobs.forEach((job) => {
-		schedule(job.interval, job.jobFunction);
-	});
 }

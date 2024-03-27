@@ -1,4 +1,4 @@
-import { defineConfig } from "./src/zodConfig/zodSchemas";
+import { defineConfig } from "./src/zodConfig/zodSchemas.ts";
 
 export default defineConfig({
 	cron_intervals: {

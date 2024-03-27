@@ -3,10 +3,8 @@ import { z } from "zod";
 /**
  * Cron interval string
  */
-const cronRegex: RegExp = new RegExp(
-	"/(@(annually|yearly|monthly|weekly|daily|hourly|reboot))|(@every (d+(ns|us|µs|ms|s|m|h))+)|((((d+,)+d+|(d+(/|-)d+)|d+|*) ?){5,7})/",
-);
-const ZodCronString = z.string().regex(cronRegex);
+
+const ZodCronString = z.string();
 
 export type CronString = z.infer<typeof ZodCronString>;
 
