@@ -4,7 +4,8 @@ import setupCronSchedule from "./src/CronSetup.ts";
 import dotenv from "dotenv";
 
 dotenv.config();
-//Start the gRPC server
+
+// Start the gRPC server
 const server = new GRPCServer(
     "CDM-ProtocolBuffer/cdm_protobuf.proto"
 ).getServer();

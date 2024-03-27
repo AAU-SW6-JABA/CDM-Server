@@ -7,36 +7,37 @@ import type {
 } from "@prisma/client";
 import { errorMonitor } from "events";
 
-export class LocationDatabase {
+class CDMDatabase {
     public Prisma: PrismaClient;
 
     constructor() {
         this.Prisma = new PrismaClient();
     }
 
-    async getLocation(method: number,
+    async getLocation(
+        method: number,
         identifier?: string,
         timeinterval?: number,
-        n_recent?: number):
-        Promise<location[]> {
+        n_recent?: number
+    ): Promise<location[]> {
         switch (method) {
             //Getting Location/s using Identifier.
             case 0: {
                 if (!identifier) {
-                    throw new Error("An identifer is requried")
+                    throw new Error("An identifer is requried");
                 }
                 let query: Prisma.locationFindManyArgs = {};
 
                 query.where = {
-                    identifier: identifier
-                }
+                    identifier: identifier,
+                };
 
                 return await this.Prisma.location.findMany(query);
             }
             //Gettting location/s using timestamp in unix time.
             case 1: {
                 if (!timeinterval) {
-                    throw new Error("A time interval is required")
+                    throw new Error("A time interval is required");
                 }
                 let query: Prisma.locationFindManyArgs = {};
                 const endTime = Date.now();
@@ -48,28 +49,55 @@ export class LocationDatabase {
                 };
                 return await this.Prisma.location.findMany(query);
             }
-            //Getting n most recent location/s  
+            //Getting n most recent location/s
             case 2: {
                 if (!n_recent) {
-                    throw new Error("The number of recent locations is requried");
+                    throw new Error(
+                        "The number of recent locations is requried"
+                    );
                 }
                 return await this.Prisma.location.findMany({
                     orderBy: {
-                        calctime: 'desc',
+                        calctime: "desc",
                     },
                     take: n_recent,
-                })
+                });
             }
             //Gettting all location
             case 3: {
                 return await this.Prisma.location.findMany();
             }
         }
-        throw new Error("Method is requried")
+        throw new Error("Method is requried");
     }
 
     async getAllMeasurements(): Promise<measurement[]> {
         return await this.Prisma.measurement.findMany();
+    }
+
+    async getNNewestMeasurements(n: number = 1): Promise<measurement[][]> {
+        const identifiers = await this.Prisma.measurement.findMany({
+            select: {
+                identifier: true,
+            },
+            distinct: ["identifier"],
+        });
+
+        const promises = identifiers.map((identifier) =>
+            this.Prisma.measurement.findMany({
+                where: {
+                    identifier: identifier.identifier,
+                },
+                orderBy: {
+                    timestamp: "desc",
+                },
+                take: n,
+            })
+        );
+
+        const measurements = Promise.all(promises);
+
+        return measurements;
     }
 
     async getMeasurementsBetweenTimestamps(
@@ -93,9 +121,7 @@ export class LocationDatabase {
         return await this.Prisma.calculation.findMany();
     }
 
-    async getAntennasUsingAid(
-        aid: number
-    ): Promise<antennas[]> {
+    async getAntennasUsingAid(aid: number): Promise<antennas[]> {
         let query: Prisma.antennasFindManyArgs = {};
 
         if (aid) {
@@ -141,7 +167,11 @@ export class LocationDatabase {
         });
     }
 
-    async insertCalculations(identifier: string, calctime: number, mid: number) {
+    async insertCalculations(
+        identifier: string,
+        calctime: number,
+        mid: number
+    ) {
         await this.Prisma.calculation.create({
             data: {
                 identifier: identifier,
@@ -161,3 +191,6 @@ export class LocationDatabase {
         return antenna;
     }
 }
+
+const cdm_db = new CDMDatabase();
+export default cdm_db;

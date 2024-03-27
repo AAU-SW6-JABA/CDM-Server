@@ -19,7 +19,8 @@
         "prisma": "^5.10.2",
         "reflect-metadata": "^0.2.1",
         "ts-node": "^10.9.2",
-        "typescript": "^5.3.3"
+        "typescript": "^5.3.3",
+        "zod": "^3.22.4"
     },
     "scripts": {
         "setup:proto-types": "yarn run proto-loader-gen-types --grpcLib=@grpc/grpc-js --outDir=gen/protobuf CDM-ProtocolBuffer/cdm_protobuf.proto",
