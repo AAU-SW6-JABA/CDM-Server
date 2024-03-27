@@ -55,9 +55,10 @@ export class LocationDatabase {
 						"The number of recent locations is requried",
 					);
 				}
-				return await this.Prisma.location.findMany({
+				await this.Prisma.location.groupBy({
+					by: "identifier",
 					orderBy: {
-						calctime: "desc",
+						identifier: "desc",
 					},
 					take: n_recent,
 				});
