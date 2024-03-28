@@ -1,6 +1,6 @@
 import * as grpc from "@grpc/grpc-js";
 import * as protoLoader from "@grpc/proto-loader";
-import { LocationDatabase } from "../queries.ts";
+import cdm_db from "../queries.ts";
 import { ProtoGrpcType } from "../../gen/protobuf/cdm_protobuf.ts";
 import { RoutesHandlers } from "../../gen/protobuf/cdm_protobuf/Routes.ts";
 import { Empty__Output, Empty } from "../../gen/protobuf/cdm_protobuf/Empty.ts";
@@ -18,12 +18,12 @@ import type { antennas, location } from "@prisma/client";
 export class GRPCServer {
 	cdm_protobuffer: ProtoGrpcType;
 	protoPath: string;
-	db: LocationDatabase;
+	db: typeof cdm_db;
 
 	constructor(protoPath: string) {
 		this.protoPath = protoPath;
 		this.cdm_protobuffer = this.setupProto();
-		this.db = new LocationDatabase();
+		this.db = cdm_db;
 	}
 
 	//Load the protocol buffer

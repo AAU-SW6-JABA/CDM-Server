@@ -6,7 +6,7 @@ import type {
 	measurement,
 } from "@prisma/client";
 
-export class LocationDatabase {
+class CDMDatabase {
 	public Prisma: PrismaClient;
 
 	constructor() {
@@ -72,6 +72,31 @@ export class LocationDatabase {
 
 	async getAllMeasurements(): Promise<measurement[]> {
 		return await this.Prisma.measurement.findMany();
+	}
+
+	async getNNewestMeasurements(n: number = 1): Promise<measurement[][]> {
+		const identifiers = await this.Prisma.measurement.findMany({
+			select: {
+				identifier: true,
+			},
+			distinct: ["identifier"],
+		});
+
+		const promises = identifiers.map((identifier) =>
+			this.Prisma.measurement.findMany({
+				where: {
+					identifier: identifier.identifier,
+				},
+				orderBy: {
+					timestamp: "desc",
+				},
+				take: n,
+			}),
+		);
+
+		const measurements = Promise.all(promises);
+
+		return measurements;
 	}
 
 	async getMeasurementsBetweenTimestamps(
@@ -176,3 +201,6 @@ export class LocationDatabase {
 		return antenna;
 	}
 }
+
+const cdm_db = new CDMDatabase();
+export default cdm_db;
