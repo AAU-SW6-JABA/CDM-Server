@@ -1,5 +1,5 @@
 import { schedule } from "node-cron";
-
+import { log } from "mathjs";
 import config from "../config.ts";
 import cdm_db from "./queries.ts";
 import { measurement } from "@prisma/client";
@@ -52,8 +52,16 @@ function gaterMeasurementData(): measurement[][] {
 				.getNNewestMeasurements(config.filter.n)
 				.then((measurementsPrIdentifier: measurement[][]) => {
 					// FILTER AND CALCULATE THE AVERAGE
+					let sanatizedData: measurement[][] = [];
 					measurementsPrIdentifier.forEach((measurements) => {
+						let sumDBM: number;
+						let avgDBM: number;
+						let avgx: number;
+						let avgy: number;
+						let timestamp: number = measurements[0].timestamp;
+
 						measurements.forEach((measurement) => {
+							sumDBM += measurement.strengthDBM;
 							console.log(
 								`Identifier: ${measurement.identifier} Timestamp: ${measurement.timestamp}`,
 							);
@@ -70,4 +78,39 @@ function gaterMeasurementData(): measurement[][] {
 	}
 
 	return [];
+}
+
+function calculateDistance(
+	calibratedStrength: number,
+	snStrength1: number,
+	calibratedDistance: number,
+	pathLossExponent: number,
+) {
+	return (
+		10 ^
+		((-(calibratedStrength - snStrength1) / (10 * pathLossExponent)) *
+			calibratedDistance)
+	);
+}
+/*Propagation model
+* P_hat(d) = P_0 - 10 * n * log10(d/d_0) + X_gaussian_random_variable
+
+*d isolated:
+* d=10 ^ (-(s-s_0)/ (10 * n))* d_0
+* s : signal strength
+* 
+* n = - ((ln(10) * s - ln(10) * s_0) / (10 * ln(d/d_0)))
+*/
+
+function getPathLossExponent(
+	snStrength0: number,
+	snStrength: number,
+	distance0: number,
+	distance: number,
+) {
+	return (
+		-1 *
+		((log(10) * snStrength - log(10) * snStrength) /
+			(10 * log(distance / distance0)))
+	);
 }
