@@ -2,7 +2,10 @@ import { schedule } from "node-cron";
 import { log } from "mathjs";
 import config from "../config.ts";
 import cdm_db from "./queries.ts";
-import { measurement } from "@prisma/client";
+import { measurement, antennas } from "@prisma/client";
+import { GetXAndY } from "./Triangulation/trilateration.ts";
+import { Antenna } from "./Triangulation/Antenna.ts";
+import { Coordinates } from "./Triangulation/Coordinates.ts";
 
 /**
  * List of cron jobs to be added
@@ -26,10 +29,42 @@ export default function setupCronSchedule() {
 /**
  * Functions for the cron jobs
  */
-function calculateLocations() {
-	console.log("moin");
-
+async function calculateLocations() {
+	const pathLossExponent: number = getPathLossExponent(
+		config.calculationCalibration.signalStrengthCalibration1,
+		config.calculationCalibration.signalStrengthCalibration0,
+		config.calculationCalibration.distanceCalibration1,
+		config.calculationCalibration.distanceCalibration0,
+	);
 	const data: measurement[][] = gaterMeasurementData();
+	let trilaterationData: Antenna[] = [];
+	let coordinates: Coordinates;
+
+	for (const measurements of data) {
+		for (const measurement of measurements) {
+			let distance: number;
+			let x: number;
+			let y: number;
+
+			distance = calculateDistance(
+				config.calculationCalibration.signalStrengthCalibration0,
+				measurement.strengthDBM,
+				config.calculationCalibration.distanceCalibration0,
+				pathLossExponent,
+			);
+			let bingantenna: antennas = await cdm_db.getAntennasUsingAid(
+				measurement.aid,
+			);
+
+			trilaterationData.push({
+				x: bingantenna.x,
+				y: bingantenna.y,
+				distance: distance,
+			});
+		}
+	}
+	coordinates = GetXAndY(trilaterationData);
+
 	console.log(`Got measurements for ${data.length} locations`);
 }
 
@@ -107,10 +142,10 @@ function getPathLossExponent(
 	snStrength: number,
 	distance0: number,
 	distance: number,
-) {
+): number {
 	return (
 		-1 *
-		((log(10) * snStrength - log(10) * snStrength) /
+		((log(10) * snStrength - log(10) * snStrength0) /
 			(10 * log(distance / distance0)))
 	);
 }

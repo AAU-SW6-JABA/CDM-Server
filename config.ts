@@ -8,4 +8,10 @@ export default defineConfig({
 		method: "none",
 	},
 	calculationMethod: "default",
+	calculationCalibrations: {
+		signalStrengthCalibration0: 0,
+		signalStrengthCalibration1: 0,
+		distanceCalibration0: 0,
+		distanceCalibration1: 0,
+	},
 });
