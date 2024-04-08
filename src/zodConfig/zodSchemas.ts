@@ -39,6 +39,14 @@ const ZodCalculationMethods = z.enum(supportedCalculationMethods);
 
 export type CalculationMethod = z.infer<typeof ZodCalculationMethods>;
 
+const ZodCalculationCalibration = z.object({
+	signalStrengthCalibration0: z.number().default(0),
+	signalStrengthCalibration1: z.number().default(0),
+	distanceCalibration0: z.number().default(0),
+	distanceCalibration1: z.number().default(0),
+});
+export type CalculationCalibration = z.infer<typeof ZodCalculationCalibration>;
+
 /**
  * Config file schema
  */
@@ -46,6 +54,7 @@ export const ZodConfig = z.object({
 	cron_intervals: ZodCronJobs,
 	filter: ZodFilterMethods,
 	calculationMethod: ZodCalculationMethods,
+	calculationCalibration: ZodCalculationCalibration,
 });
 
 export type Config = z.infer<typeof ZodConfig>;

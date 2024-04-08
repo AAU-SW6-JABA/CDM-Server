@@ -120,7 +120,7 @@ class CDMDatabase {
 		return await this.Prisma.calculation.findMany();
 	}
 
-	async getAntennasUsingAid(aid: number): Promise<antennas[]> {
+	async getAntennasUsingAid(aid: number): Promise<antennas> {
 		const query: Prisma.antennasFindManyArgs = {};
 
 		if (aid) {
@@ -129,8 +129,9 @@ class CDMDatabase {
 			};
 		}
 
-		return await this.Prisma.antennas.findMany(query);
+		return await this.Prisma.antennas.findFirstOrThrow(query);
 	}
+
 	async getAllAntennas(): Promise<antennas[]> {
 		return await this.Prisma.antennas.findMany();
 	}

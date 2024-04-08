@@ -1,9 +1,7 @@
 import { Antenna } from "./Antenna.ts";
+import { Coordinates } from "./Coordinates.ts";
 
-export function GetXAndY(antennas: Antenna[]): {
-	x: number;
-	y: number;
-} {
+export function GetXAndY(antennas: Antenna[]): Coordinates {
 	if (antennas.length < 3) {
 		throw new Error("Invalid input: At least 3 antennas are required.");
 	}
