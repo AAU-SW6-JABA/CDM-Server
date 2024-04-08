@@ -37,12 +37,12 @@ async function calculateLocations() {
 		config.calculationCalibration.distanceCalibration0,
 	);
 	const data: measurement[][] = gatherMeasurementData();
-	let counter: number = 0;
 
 	for (const measurements of data) {
 		let calctime: number = Date.now();
 		let coordinates: Coordinates;
 		let trilaterationData: Antenna[] = [];
+		let identifier: string = measurements[0].identifier;
 		//All measurements with the same identifier
 		for (const measurement of measurements) {
 			let distance: number;
@@ -54,9 +54,8 @@ async function calculateLocations() {
 				config.calculationCalibration.distanceCalibration0,
 				pathLossExponent,
 			);
-			let bingantenna: antennas = await cdm_db.getAntennasUsingAid(
-				measurement.aid,
-			);
+			let jesperhaderminnaming_antenna: antennas =
+				await cdm_db.getAntennasUsingAid(measurement.aid);
 			//Insert the calculations
 			cdm_db
 				.insertCalculations(
@@ -69,8 +68,8 @@ async function calculateLocations() {
 				});
 
 			trilaterationData.push({
-				x: bingantenna.x,
-				y: bingantenna.y,
+				x: jesperhaderminnaming_antenna.x,
+				y: jesperhaderminnaming_antenna.y,
 				distance: distance,
 			});
 		}
@@ -78,16 +77,10 @@ async function calculateLocations() {
 		coordinates = GetXAndY(trilaterationData);
 		//Insert the location into the database
 		cdm_db
-			.insertLocations(
-				measurements[counter].identifier,
-				calctime,
-				coordinates.x,
-				coordinates.y,
-			)
+			.insertLocations(identifier, calctime, coordinates.x, coordinates.y)
 			.catch((error: Error) => {
 				console.log(error);
 			});
-		counter++;
 	}
 }
 
