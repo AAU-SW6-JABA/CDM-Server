@@ -54,8 +54,9 @@ async function calculateLocations() {
 				config.calculationCalibration.distanceCalibration0,
 				pathLossExponent,
 			);
-			let jesperhaderminnaming_antenna: antennas =
-				await cdm_db.getAntennasUsingAid(measurement.aid);
+			let antenna: antennas = await cdm_db.getAntennasUsingAid(
+				measurement.aid,
+			);
 			//Insert the calculations
 			cdm_db
 				.insertCalculations(
@@ -68,8 +69,8 @@ async function calculateLocations() {
 				});
 
 			trilaterationData.push({
-				x: jesperhaderminnaming_antenna.x,
-				y: jesperhaderminnaming_antenna.y,
+				x: antenna.x,
+				y: antenna.y,
 				distance: distance,
 			});
 		}
