@@ -36,16 +36,18 @@ async function calculateLocations() {
 		config.calculationCalibration.distanceCalibration1,
 		config.calculationCalibration.distanceCalibration0,
 	);
-	const data: measurement[][] = gaterMeasurementData();
-	let trilaterationData: Antenna[] = [];
-	let coordinates: Coordinates;
+	const data: measurement[][] = gatherMeasurementData();
+	let counter: number = 0;
 
 	for (const measurements of data) {
+		let calctime: number = Date.now();
+		let coordinates: Coordinates;
+		let trilaterationData: Antenna[] = [];
+		//All measurements with the same identifier
 		for (const measurement of measurements) {
 			let distance: number;
 			let x: number;
 			let y: number;
-
 			distance = calculateDistance(
 				config.calculationCalibration.signalStrengthCalibration0,
 				measurement.strengthDBM,
@@ -55,6 +57,16 @@ async function calculateLocations() {
 			let bingantenna: antennas = await cdm_db.getAntennasUsingAid(
 				measurement.aid,
 			);
+			//Insert the calculations
+			cdm_db
+				.insertCalculations(
+					measurement.identifier,
+					calctime,
+					measurement.mid,
+				)
+				.catch((error: Error) => {
+					console.log(error);
+				});
 
 			trilaterationData.push({
 				x: bingantenna.x,
@@ -62,13 +74,24 @@ async function calculateLocations() {
 				distance: distance,
 			});
 		}
+		//Calculate the coordinates for
+		coordinates = GetXAndY(trilaterationData);
+		//Insert the location into the database
+		cdm_db
+			.insertLocations(
+				measurements[counter].identifier,
+				calctime,
+				coordinates.x,
+				coordinates.y,
+			)
+			.catch((error: Error) => {
+				console.log(error);
+			});
+		counter++;
 	}
-	coordinates = GetXAndY(trilaterationData);
-
-	console.log(`Got measurements for ${data.length} locations`);
 }
 
-function gaterMeasurementData(): measurement[][] {
+function gatherMeasurementData(): measurement[][] {
 	switch (config.filter.method) {
 		case "none":
 			cdm_db
