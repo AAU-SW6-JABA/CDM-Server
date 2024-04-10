@@ -292,15 +292,18 @@ export class GRPCServer {
 			if (!subscribers.clientidMap.has(data)) {
 				subscribers.addClient(data);
 			}
-			while (!call.cancelled) {
-				if (newLocations.newdata) {
-					call.write(newLocations.locations);
-					newLocations.deleteLocations();
-				}
-			}
+			this.StreamLocations(call);
 		});
 	}
-
+	StreamLocations(
+		call: grpc.ServerWritableStream<SubscribeRequest__Output, Locations>,
+	) {
+		if (newLocations.newdata) {
+			call.write(newLocations.locations);
+			newLocations.deleteLocations();
+		}
+		setTimeout(this.StreamLocations, 100, call);
+	}
 	//Set up gRPC server with all services
 	getServer(): grpc.Server {
 		const server = new grpc.Server();
