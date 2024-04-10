@@ -302,7 +302,6 @@ export class GRPCServer {
 				}
 			}
 		});
-		call.write;
 	}
 
 	//Set up gRPC server with all services
