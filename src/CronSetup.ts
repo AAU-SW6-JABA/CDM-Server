@@ -6,6 +6,8 @@ import { measurement, antennas } from "@prisma/client";
 import { GetXAndY } from "./Triangulation/trilateration.ts";
 import { Antenna } from "./Triangulation/Antenna.ts";
 import { Coordinates } from "./Triangulation/Coordinates.ts";
+import { Locations } from "../gen/protobuf/cdm_protobuf/Locations.ts";
+import { newLocations } from "./Locations.ts";
 
 /**
  * List of cron jobs to be added
@@ -82,7 +84,16 @@ async function calculateLocations() {
 			.catch((error: Error) => {
 				console.log(error);
 			});
+		if (newLocations.locations.location != undefined) {
+			newLocations.locations.location.push({
+				identifier: identifier,
+				x: coordinates.x,
+				y: coordinates.y,
+			});
+		}
 	}
+	newLocations.newdata = true;
+	//send data til subscribers => locations
 }
 
 function gatherMeasurementData(): measurement[][] {

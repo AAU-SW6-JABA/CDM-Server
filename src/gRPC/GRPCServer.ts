@@ -14,6 +14,11 @@ import { LogMeasurementsRequest__Output } from "../../gen/protobuf/cdm_protobuf/
 import { RegisterAntennaRequest__Output } from "../../gen/protobuf/cdm_protobuf/RegisterAntennaRequest.ts";
 import { RegisterAntennaResponse } from "../../gen/protobuf/cdm_protobuf/RegisterAntennaResponse.ts";
 import type { antennas, location } from "@prisma/client";
+import { subscribers } from "./Subscribe.ts";
+import { SubscribeRequest__Output } from "../../gen/protobuf/cdm_protobuf/SubscribeRequest.ts";
+import { Server__Output } from "@grpc/grpc-js/build/src/generated/grpc/channelz/v1/Server.js";
+import { Locations } from "../../gen/protobuf/cdm_protobuf/Locations.ts";
+import { newLocations } from "../Locations.ts";
 
 export class GRPCServer {
 	cdm_protobuffer: ProtoGrpcType;
@@ -76,6 +81,14 @@ export class GRPCServer {
 			>,
 			callback: grpc.sendUnaryData<RegisterAntennaResponse>,
 		) => this.registerAntennaRoute(call, callback),
+
+		//Allows for clients to subscribe to new locations
+		SubscribeToLocations: (
+			call: grpc.ServerWritableStream<
+				SubscribeRequest__Output,
+				Locations
+			>,
+		) => this.subscribeRequest(call),
 	};
 	getAntennasRoute(
 		call: grpc.ServerUnaryCall<Empty__Output, GetAntennasResponse>,
@@ -268,6 +281,29 @@ export class GRPCServer {
 					details: `Error inserting antenna: ${err}`,
 				});
 			});
+	}
+
+	subscribeRequest(
+		call: grpc.ServerWritableStream<SubscribeRequest__Output, Locations>,
+	) {
+		call.on("data", (data: SubscribeRequest__Output) => {
+			if (typeof data.clientid === "string") {
+				throw new Error("Client ID is unknown");
+			}
+			if (!subscribers.clientidMap.has(data)) {
+				subscribers.addClient(data);
+			}
+			while (true) {
+				if (call.cancelled) {
+					break;
+				}
+				if (newLocations.newdata) {
+					call.write(newLocations.locations);
+					newLocations.deleteLocations();
+				}
+			}
+		});
+		call.write;
 	}
 
 	//Set up gRPC server with all services

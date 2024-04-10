@@ -4,9 +4,9 @@
 
 This project uses the submodule at https://github.com/AAU-SW6-JABA/CDM-ProtocolBuffer
 
-# Initializing the project
+# Initializing the project.
 
-First install dependencies with yarn:
+First, install dependencies with yarn:
 
 ```
 yarn install
