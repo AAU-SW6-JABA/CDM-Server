@@ -6,7 +6,6 @@ import { measurement, antennas } from "@prisma/client";
 import { GetXAndY } from "./Triangulation/trilateration.ts";
 import { Antenna } from "./Triangulation/Antenna.ts";
 import { Coordinates } from "./Triangulation/Coordinates.ts";
-import { Locations } from "../gen/protobuf/cdm_protobuf/Locations.ts";
 import { newLocations } from "./Locations.ts";
 
 /**
@@ -41,10 +40,10 @@ async function calculateLocations() {
 	const data: measurement[][] = gatherMeasurementData();
 
 	for (const measurements of data) {
-		let calctime: number = Date.now();
+		const calctime: number = Date.now();
 		let coordinates: Coordinates;
-		let trilaterationData: Antenna[] = [];
-		let identifier: string = measurements[0].identifier;
+		const trilaterationData: Antenna[] = [];
+		const identifier: string = measurements[0].identifier;
 		//All measurements with the same identifier
 		for (const measurement of measurements) {
 			let distance: number;
@@ -56,7 +55,7 @@ async function calculateLocations() {
 				config.calculationCalibration.distanceCalibration0,
 				pathLossExponent,
 			);
-			let antenna: antennas = await cdm_db.getAntennasUsingAid(
+			const antenna: antennas = await cdm_db.getAntennasUsingAid(
 				measurement.aid,
 			);
 			//Insert the calculations
@@ -115,13 +114,13 @@ function gatherMeasurementData(): measurement[][] {
 				.getNNewestMeasurements(config.filter.n)
 				.then((measurementsPrIdentifier: measurement[][]) => {
 					// FILTER AND CALCULATE THE AVERAGE
-					let sanatizedData: measurement[][] = [];
+					const sanatizedData: measurement[][] = [];
 					measurementsPrIdentifier.forEach((measurements) => {
 						let sumDBM: number;
 						let avgDBM: number;
 						let avgx: number;
 						let avgy: number;
-						let timestamp: number = measurements[0].timestamp;
+						const timestamp: number = measurements[0].timestamp;
 
 						measurements.forEach((measurement) => {
 							sumDBM += measurement.strengthDBM;

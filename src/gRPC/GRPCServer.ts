@@ -16,7 +16,6 @@ import { RegisterAntennaResponse } from "../../gen/protobuf/cdm_protobuf/Registe
 import type { antennas, location } from "@prisma/client";
 import { subscribers } from "./Subscribe.ts";
 import { SubscribeRequest__Output } from "../../gen/protobuf/cdm_protobuf/SubscribeRequest.ts";
-import { Server__Output } from "@grpc/grpc-js/build/src/generated/grpc/channelz/v1/Server.js";
 import { Locations } from "../../gen/protobuf/cdm_protobuf/Locations.ts";
 import { newLocations } from "../Locations.ts";
 
