@@ -2,6 +2,7 @@ import * as grpc from "@grpc/grpc-js";
 import { GRPCServer } from "./gRPC/GRPCServer.ts";
 import cdm_db from "./queries.ts";
 import dotenv from "dotenv";
+import setupCronSchedule from "./CronSetup.ts";
 import { Command } from "commander";
 
 const program = new Command();
@@ -45,3 +46,5 @@ server.bindAsync(
 		);
 	},
 );
+// Setup Cron jobs
+setupCronSchedule();

@@ -8,7 +8,7 @@ export default defineConfig({
 		method: "none",
 	},
 	calculationMethod: "default",
-	calculationCalibrations: {
+	calculationCalibration: {
 		signalStrengthCalibration0: 0,
 		signalStrengthCalibration1: 0,
 		distanceCalibration0: 0,
