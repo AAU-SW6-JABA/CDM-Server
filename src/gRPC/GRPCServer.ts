@@ -292,10 +292,7 @@ export class GRPCServer {
 			if (!subscribers.clientidMap.has(data)) {
 				subscribers.addClient(data);
 			}
-			while (true) {
-				if (call.cancelled) {
-					break;
-				}
+			while (!call.cancelled) {
 				if (newLocations.newdata) {
 					call.write(newLocations.locations);
 					newLocations.deleteLocations();
