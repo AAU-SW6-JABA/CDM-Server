@@ -37,7 +37,8 @@ async function calculateLocations() {
 		config.calculationCalibration.distanceCalibration1,
 		config.calculationCalibration.distanceCalibration0,
 	);
-	const data: measurement[][] = gatherMeasurementData();
+	const data: measurement[][] = await gatherMeasurementData();
+	console.log(data);
 
 	for (const measurements of data) {
 		const calctime: number = Date.now();
@@ -95,22 +96,23 @@ async function calculateLocations() {
 	//send data til subscribers => locations
 }
 
-function gatherMeasurementData(): measurement[][] {
+async function gatherMeasurementData(): Promise<measurement[][]> {
+	let data: measurement[][] = [];
 	switch (config.filter.method) {
 		case "none":
-			cdm_db
+			await cdm_db
 				.getNNewestMeasurements()
 				.then((measurements: measurement[][]) => {
-					return measurements;
+					data = measurements;
 				})
 				.catch((error: Error) => {
 					console.error(error);
-					return [];
+					return error;
 				});
 			break;
 
 		case "NAverage":
-			cdm_db
+			await cdm_db
 				.getNNewestMeasurements(config.filter.n)
 				.then((measurementsPrIdentifier: measurement[][]) => {
 					// FILTER AND CALCULATE THE AVERAGE
@@ -138,8 +140,7 @@ function gatherMeasurementData(): measurement[][] {
 				});
 			break;
 	}
-
-	return [];
+	return data;
 }
 
 function calculateDistance(
