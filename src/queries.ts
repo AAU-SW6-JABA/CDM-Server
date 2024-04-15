@@ -201,6 +201,25 @@ class CDMDatabase {
 		});
 		return antenna;
 	}
+
+	async resetDB() {
+		try {
+			await this.Prisma.$executeRawUnsafe(
+				`TRUNCATE TABLE calculation CASCADE;`,
+			);
+			await this.Prisma.$executeRawUnsafe(
+				`TRUNCATE TABLE location CASCADE;`,
+			);
+			await this.Prisma.$executeRawUnsafe(
+				`TRUNCATE TABLE measurement CASCADE;`,
+			);
+			await this.Prisma.$executeRawUnsafe(
+				`TRUNCATE TABLE antennas CASCADE;`,
+			);
+		} catch (error) {
+			console.log({ error });
+		}
+	}
 }
 
 const cdm_db = new CDMDatabase();
