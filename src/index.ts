@@ -9,7 +9,7 @@ const program = new Command();
 program
 	.name("CDM-Server")
 	.description(
-		"Server that handles gRPC communication with nodes and clients aswell as handling communication with a postgres DB.",
+		"Server that handles gRPC communication with nodes and clients as well as handling communication with a postgres DB.",
 	);
 
 program.option(
