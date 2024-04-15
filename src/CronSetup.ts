@@ -56,19 +56,10 @@ async function calculateLocations() {
 				config.calculationCalibration.distanceCalibration0,
 				pathLossExponent,
 			);
+			console.log(`Distance: ${distance}`);
 			const antenna: antennas = await cdm_db.getAntennasUsingAid(
 				measurement.aid,
 			);
-			//Insert the calculations
-			cdm_db
-				.insertCalculations(
-					measurement.identifier,
-					calctime,
-					measurement.mid,
-				)
-				.catch((error: Error) => {
-					console.log(error);
-				});
 
 			trilaterationData.push({
 				x: antenna.x,
@@ -78,8 +69,10 @@ async function calculateLocations() {
 		}
 		//Calculate the coordinates for
 		coordinates = GetXAndY(trilaterationData);
+		console.log(`X: ${coordinates.x} Y: ${coordinates.y}`);
 		//Insert the location into the database
-		cdm_db
+		//Insert the calculations
+		await cdm_db
 			.insertLocations(identifier, calctime, coordinates.x, coordinates.y)
 			.catch((error: Error) => {
 				console.log(error);
@@ -148,9 +141,9 @@ function calculateDistance(
 	snStrength1: number,
 	calibratedDistance: number,
 	pathLossExponent: number,
-) {
+): number {
 	return (
-		10 ^
+		10 **
 		((-(calibratedStrength - snStrength1) / (10 * pathLossExponent)) *
 			calibratedDistance)
 	);

@@ -73,24 +73,45 @@ class CDMDatabase {
 	async getAllMeasurements(): Promise<measurement[]> {
 		return await this.Prisma.measurement.findMany();
 	}
-
-	async getNNewestMeasurements(n: number = 1): Promise<measurement[][]> {
+	/*
+	 *	Struktur af hvad fuck vi gerne vil have
+	 *	imsi[antal n measurements for hver antenne] imsi[] imsi[] imsi[]
+	 *	[[{identifier:1111, antennaid:1} {identifier:1111, antennaid:2} {identifier:1111 antennaid:3}], [{identifier:2222, antennaid:1} {identifier:2222, antennaid:2} {identifier:2222, antennaid:3}] ]
+	 *
+	 */
+	async getNNewestMeasurements(n: number = 2): Promise<measurement[][]> {
+		//Find først alle antenner
 		const identifiers = await this.Prisma.measurement.findMany({
 			select: {
 				identifier: true,
 			},
 			distinct: ["identifier"],
 		});
+		const skipidoo = await this.Prisma.antennas.findMany({
+			select: {
+				aid: true,
+			},
+			distinct: ["aid"],
+		});
+		console.log(skipidoo);
 
 		const promises = identifiers.map((identifier) =>
 			this.Prisma.measurement.findMany({
 				where: {
 					identifier: identifier.identifier,
 				},
+				select: {
+					mid: true,
+					identifier: true,
+					aid: true,
+					timestamp: true,
+					strengthDBM: true,
+				},
 				orderBy: {
 					timestamp: "desc",
 				},
-				take: n,
+				take: skipidoo.length,
+				distinct: ["aid"],
 			}),
 		);
 

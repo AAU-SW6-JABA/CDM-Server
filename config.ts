@@ -9,9 +9,9 @@ export default defineConfig({
 	},
 	calculationMethod: "default",
 	calculationCalibration: {
-		signalStrengthCalibration0: 0,
-		signalStrengthCalibration1: 0,
-		distanceCalibration0: 0,
-		distanceCalibration1: 0,
+		signalStrengthCalibration0: -2,
+		signalStrengthCalibration1: -6,
+		distanceCalibration0: 2,
+		distanceCalibration1: 10,
 	},
 });
