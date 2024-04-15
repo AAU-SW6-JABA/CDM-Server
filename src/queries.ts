@@ -203,19 +203,19 @@ class CDMDatabase {
 	}
 
 	async resetDB() {
+		const tableNames = [
+			"calculation",
+			"location",
+			"measurement",
+			"antennas",
+		];
+
 		try {
-			await this.Prisma.$executeRawUnsafe(
-				`TRUNCATE TABLE calculation CASCADE;`,
-			);
-			await this.Prisma.$executeRawUnsafe(
-				`TRUNCATE TABLE location CASCADE;`,
-			);
-			await this.Prisma.$executeRawUnsafe(
-				`TRUNCATE TABLE measurement CASCADE;`,
-			);
-			await this.Prisma.$executeRawUnsafe(
-				`TRUNCATE TABLE antennas CASCADE;`,
-			);
+			tableNames.forEach(async (tableName) => {
+				await this.Prisma.$executeRawUnsafe(
+					`TRUNCATE TABLE ${tableName} CASCADE;`,
+				);
+			});
 		} catch (error) {
 			console.log({ error });
 		}
