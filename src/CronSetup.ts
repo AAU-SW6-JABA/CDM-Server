@@ -1,7 +1,7 @@
 import { schedule } from "node-cron";
 import { log } from "mathjs";
 import config from "../config.ts";
-import cdm_db from "./queries.ts";
+import cdm_db, {GroupedMeasurements} from "./queries.ts";
 import { measurement, antennas } from "@prisma/client";
 import { GetXAndY } from "./Triangulation/trilateration.ts";
 import { Antenna } from "./Triangulation/Antenna.ts";
@@ -37,7 +37,7 @@ async function calculateLocations() {
 		config.calculationCalibration.distanceCalibration1,
 		config.calculationCalibration.distanceCalibration0,
 	);
-	const data: measurement[][] = await gatherMeasurementData();
+	const data: GroupedMeasurements = await gatherMeasurementData();
 	console.log(data);
 
 	for (const measurements of data) {
@@ -86,13 +86,13 @@ async function calculateLocations() {
 	}
 }
 
-async function gatherMeasurementData(): Promise<measurement[][]> {
-	let data: measurement[][] = [];
+async function gatherMeasurementData(): Promise<GroupedMeasurements> {
+	let data: GroupedMeasurements;
 	switch (config.filter.method) {
 		case "none":
 			await cdm_db
-				.getNNewestMeasurements()
-				.then((measurements: measurement[][]) => {
+				.getNewestMeasurements(Date.now() + 60_000) // TODO: sæt en værdi her som ikke er hard coded
+				.then((measurements: GroupedMeasurements) => {
 					data = measurements;
 				})
 				.catch((error: Error) => {
@@ -103,8 +103,8 @@ async function gatherMeasurementData(): Promise<measurement[][]> {
 
 		case "NAverage":
 			await cdm_db
-				.getNNewestMeasurements(config.filter.n)
-				.then((measurementsPrIdentifier: measurement[][]) => {
+				.getNewestMeasurements(Date.now() - config.filter.last)
+				.then((measurementsPrIdentifier: GroupedMeasurements) => {
 					// FILTER AND CALCULATE THE AVERAGE
 					const sanatizedData: measurement[][] = [];
 					measurementsPrIdentifier.forEach((measurements) => {

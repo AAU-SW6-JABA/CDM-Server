@@ -25,7 +25,7 @@ const ZodFilterMethods = z.discriminatedUnion("method", [
 	}),
 	z.object({
 		method: z.literal("NAverage"),
-		n: z.number().positive().int().default(1),
+		last: z.number().positive().int().default(10_000),
 	}),
 ]);
 

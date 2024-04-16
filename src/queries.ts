@@ -5,6 +5,12 @@ import type {
 	calculation,
 	measurement,
 } from "@prisma/client";
+import { DefaultMap } from "./DefaultMap.ts";
+
+export type GroupedMeasurements = DefaultMap<
+	string,
+	DefaultMap<number, Map<number, { mid: number; strengthDBM: number }>>
+>;
 
 class CDMDatabase {
 	public Prisma: PrismaClient;
@@ -74,50 +80,44 @@ class CDMDatabase {
 		return await this.Prisma.measurement.findMany();
 	}
 	/*
-	 *	Struktur af hvad fuck vi gerne vil have
-	 *	imsi[antal n measurements for hver antenne] imsi[] imsi[] imsi[]
-	 *	[[{identifier:1111, antennaid:1} {identifier:1111, antennaid:2} {identifier:1111 antennaid:3}], [{identifier:2222, antennaid:1} {identifier:2222, antennaid:2} {identifier:2222, antennaid:3}] ]
-	 *
+	 *	Struktur af hvad ✨regnbue✨ vi gerne vil have
+	 *	[imsi1: [antenne1: [measurements], antenne2: [measurements]], imsi2: [...],  imsi3: [...]]
 	 */
-	async getNNewestMeasurements(n: number = 2): Promise<measurement[][]> {
-		//Find først alle antenner
-		const identifiers = await this.Prisma.measurement.findMany({
-			select: {
-				identifier: true,
+	async getNewestMeasurements(limit: number): Promise<GroupedMeasurements> {
+		const measurements = await this.Prisma.measurement.findMany({
+			orderBy: [
+				{
+					identifier: "asc",
+				},
+				{
+					aid: "asc",
+				},
+				{
+					timestamp: "asc",
+				},
+			],
+			where: {
+				timestamp: {
+					gt: limit,
+				},
 			},
-			distinct: ["identifier"],
 		});
-		const skipidoo = await this.Prisma.antennas.findMany({
-			select: {
-				aid: true,
-			},
-			distinct: ["aid"],
-		});
-		console.log(skipidoo);
-
-		const promises = identifiers.map((identifier) =>
-			this.Prisma.measurement.findMany({
-				where: {
-					identifier: identifier.identifier,
-				},
-				select: {
-					mid: true,
-					identifier: true,
-					aid: true,
-					timestamp: true,
-					strengthDBM: true,
-				},
-				orderBy: {
-					timestamp: "desc",
-				},
-				take: skipidoo.length,
-				distinct: ["aid"],
-			}),
+		const groupedMeasurements: GroupedMeasurements = new DefaultMap(
+			() => new DefaultMap(() => new Map()),
 		);
-
-		const measurements = Promise.all(promises);
-
-		return measurements;
+		for (const measurement of measurements) {
+			const identifierMeasurements = groupedMeasurements.getSet(
+				measurement.identifier,
+			);
+			const antennaMeasurements = identifierMeasurements.getSet(
+				measurement.aid,
+			);
+			antennaMeasurements.set(measurement.timestamp, {
+				mid: measurement.mid,
+				strengthDBM: measurement.strengthDBM,
+			});
+		}
+		return groupedMeasurements;
 	}
 
 	async getMeasurementsBetweenTimestamps(
