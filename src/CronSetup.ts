@@ -77,16 +77,13 @@ async function calculateLocations() {
 			.catch((error: Error) => {
 				console.log(error);
 			});
-		if (newLocations.locations.location != undefined) {
-			newLocations.locations.location.push({
-				identifier: identifier,
-				x: coordinates.x,
-				y: coordinates.y,
-			});
-		}
+		//send data to subscribers => locations
+		newLocations.push({
+			identifier: identifier,
+			x: coordinates.x,
+			y: coordinates.y,
+		});
 	}
-	newLocations.newdata = true;
-	//send data til subscribers => locations
 }
 
 async function gatherMeasurementData(): Promise<measurement[][]> {

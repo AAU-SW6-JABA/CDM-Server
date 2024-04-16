@@ -83,11 +83,11 @@ export class GRPCServer {
 
 		//Allows for clients to subscribe to new locations
 		SubscribeToLocations: (
-			call: grpc.ServerWritableStream<
+			stream: grpc.ServerWritableStream<
 				SubscribeRequest__Output,
 				Locations
 			>,
-		) => this.subscribeRequest(call),
+		) => this.subscribeRequest(stream),
 	};
 	getAntennasRoute(
 		call: grpc.ServerUnaryCall<Empty__Output, GetAntennasResponse>,
@@ -283,26 +283,29 @@ export class GRPCServer {
 	}
 
 	subscribeRequest(
-		call: grpc.ServerWritableStream<SubscribeRequest__Output, Locations>,
+		stream: grpc.ServerWritableStream<SubscribeRequest__Output, Locations>,
 	) {
-		call.on("data", (data: SubscribeRequest__Output) => {
-			if (typeof data.clientid === "string") {
-				throw new Error("Client ID is unknown");
-			}
-			if (!subscribers.clientidMap.has(data)) {
-				subscribers.addClient(data);
-			}
-			this.StreamLocations(call);
-		});
+		subscribers.add(stream);
+		this.streamLocations();
 	}
-	StreamLocations(
-		call: grpc.ServerWritableStream<SubscribeRequest__Output, Locations>,
-	) {
-		if (newLocations.newdata) {
-			call.write(newLocations.locations);
-			newLocations.deleteLocations();
+	streamLocationsTimeout: NodeJS.Timeout | number | undefined;
+	streamLocations() {
+		clearTimeout(this.streamLocationsTimeout);
+		if (newLocations.length > 0) {
+			for (const stream of subscribers) {
+				if (stream.cancelled || stream.closed) {
+					subscribers.delete(stream);
+				} else {
+					stream.write({ location: newLocations });
+				}
+			}
+			newLocations.length = 0;
 		}
-		setTimeout(this.StreamLocations, 100, call);
+		if (subscribers.size > 0) {
+			this.streamLocationsTimeout = setTimeout(() => {
+				this.streamLocations();
+			}, 100);
+		}
 	}
 	//Set up gRPC server with all services
 	getServer(): grpc.Server {

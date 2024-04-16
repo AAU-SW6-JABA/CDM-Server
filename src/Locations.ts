@@ -1,15 +1,3 @@
-import { Locations__Output } from "../gen/protobuf/cdm_protobuf/Locations.ts";
-class Locations {
-	newdata: boolean;
-	locations: Locations__Output;
-	constructor() {
-		this.newdata = false;
-		this.locations = {};
-	}
-	deleteLocations() {
-		this.locations = {};
-		this.newdata = false;
-	}
-}
+import { Location__Output } from "../gen/protobuf/cdm_protobuf/Location.ts";
 
-export const newLocations = new Locations();
+export const newLocations: Location__Output[] = [];

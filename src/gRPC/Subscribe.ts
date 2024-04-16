@@ -1,20 +1,7 @@
+import * as grpc from "@grpc/grpc-js";
 import { SubscribeRequest__Output } from "../../gen/protobuf/cdm_protobuf/SubscribeRequest.ts";
+import { Locations } from "../../gen/protobuf/cdm_protobuf/Locations.ts";
 
-class Client {
-	constructor() {
-		this.clientid = "";
-	}
-	clientid: string;
-}
-
-class Subscribe {
-	constructor() {
-		this.clientidMap = new Map();
-	}
-	clientidMap: Map<SubscribeRequest__Output, Client>;
-
-	addClient(clientid: SubscribeRequest__Output) {
-		this.clientidMap.set(clientid, new Client());
-	}
-}
-export const subscribers = new Subscribe();
+export const subscribers: Set<
+	grpc.ServerWritableStream<SubscribeRequest__Output, Locations>
+> = new Set();
