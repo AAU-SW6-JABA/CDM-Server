@@ -36,12 +36,12 @@ const server = new GRPCServer(
 	"CDM-ProtocolBuffer/cdm_protobuf.proto",
 ).getServer();
 server.bindAsync(
-	`${process.env.ADDRESS}:${process.env.PORT}`,
+	`${process.env.HOST}:${process.env.PORT}`,
 	grpc.ServerCredentials.createInsecure(),
 	() => {
 		server;
 		console.log(
-			`Server running at http://${process.env.ADDRESS}:${process.env.PORT}`,
+			`Server running at http://${process.env.HOST}:${process.env.PORT}`,
 		);
 	},
 );
