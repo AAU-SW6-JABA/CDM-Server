@@ -31,11 +31,11 @@ yarn setup
 The project can be run in two different ways, namely using either the `yarn dev` or `yarn start` script. The dev script is mainly meant for use in development environments as it hot-reloads the server upon save of any file.
 
 **The following options are available:**
+
 ```
   -r, --reset-database  delete all the entries in the database on launch
   -h, --help            display help for command
 ```
-
 
 <!---
 ## Using Prisma for types in DB:
