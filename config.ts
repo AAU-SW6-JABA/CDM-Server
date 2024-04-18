@@ -5,7 +5,8 @@ export default defineConfig({
 		locationCalculation: "*/10 * * * * *",
 	},
 	filter: {
-		method: "none",
+		method: "NAverage",
+		last: Date.now(),
 	},
 	calculationMethod: "default",
 	calculationCalibration: {

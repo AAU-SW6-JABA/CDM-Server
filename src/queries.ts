@@ -9,7 +9,10 @@ import { DefaultMap } from "./DefaultMap.ts";
 
 export type GroupedMeasurements = DefaultMap<
 	string,
-	DefaultMap<number, Map<number, { mid: number; strengthDBM: number }>>
+	DefaultMap<
+		number,
+		Map<number, { mid: number | number[]; strengthDBM: number }>
+	>
 >;
 
 class CDMDatabase {

@@ -1,12 +1,13 @@
 import { schedule } from "node-cron";
 import { log } from "mathjs";
 import config from "../config.ts";
-import cdm_db, {GroupedMeasurements} from "./queries.ts";
-import { measurement, antennas } from "@prisma/client";
-import { GetXAndY } from "./Triangulation/trilateration.ts";
-import { Antenna } from "./Triangulation/Antenna.ts";
-import { Coordinates } from "./Triangulation/Coordinates.ts";
+import cdm_db, { GroupedMeasurements } from "./queries.ts";
+import { antennas } from "@prisma/client";
+import { GetXAndY } from "./Trilateration/trilateration.ts";
+import { TrilaterationData } from "./Trilateration/TrilaterationData.ts";
+import { Coordinates } from "./Trilateration/Coordinates.ts";
 import { newLocations } from "./Locations.ts";
+import { DefaultMap } from "./DefaultMap.ts";
 
 /**
  * List of cron jobs to be added
@@ -40,32 +41,31 @@ async function calculateLocations() {
 	const data: GroupedMeasurements = await gatherMeasurementData();
 	console.log(data);
 
-	for (const measurements of data) {
+	for (const [identifier, idMeasurements] of data) {
 		const calctime: number = Date.now();
 		let coordinates: Coordinates;
-		const trilaterationData: Antenna[] = [];
-		const identifier: string = measurements[0].identifier;
+		const trilaterationData: TrilaterationData[] = [];
 		//All measurements with the same identifier
-		for (const measurement of measurements) {
-			let distance: number;
-			let x: number;
-			let y: number;
-			distance = calculateDistance(
-				config.calculationCalibration.signalStrengthCalibration0,
-				measurement.strengthDBM,
-				config.calculationCalibration.distanceCalibration0,
-				pathLossExponent,
-			);
-			console.log(`Distance: ${distance}`);
-			const antenna: antennas = await cdm_db.getAntennasUsingAid(
-				measurement.aid,
-			);
+		for (const [antId, antMeasurements] of idMeasurements) {
+			const antenna: antennas = await cdm_db.getAntennasUsingAid(antId);
+			for (const [timestamp, measurement] of antMeasurements) {
+				let distance: number;
+				let x: number;
+				let y: number;
+				distance = calculateDistance(
+					config.calculationCalibration.signalStrengthCalibration0,
+					measurement.strengthDBM,
+					config.calculationCalibration.distanceCalibration0,
+					pathLossExponent,
+				);
+				console.log(`Distance: ${distance}`);
 
-			trilaterationData.push({
-				x: antenna.x,
-				y: antenna.y,
-				distance: distance,
-			});
+				trilaterationData.push({
+					x: antenna.x,
+					y: antenna.y,
+					distance: distance,
+				});
+			}
 		}
 		//Calculate the coordinates for
 		coordinates = GetXAndY(trilaterationData);
@@ -87,47 +87,29 @@ async function calculateLocations() {
 }
 
 async function gatherMeasurementData(): Promise<GroupedMeasurements> {
-	let data: GroupedMeasurements;
+	let data: GroupedMeasurements = new DefaultMap(
+		() => new DefaultMap(() => new Map()),
+	);
 	switch (config.filter.method) {
 		case "none":
-			await cdm_db
-				.getNewestMeasurements(Date.now() + 60_000) // TODO: sæt en værdi her som ikke er hard coded
-				.then((measurements: GroupedMeasurements) => {
-					data = measurements;
-				})
-				.catch((error: Error) => {
-					console.error(error);
-					return error;
-				});
+			try {
+				data = await cdm_db.getNewestMeasurements(
+					Date.now() - config.filter.last,
+				); // TODO: sæt en værdi her som ikke er hard coded
+			} catch (error) {
+				console.error(error);
+			}
 			break;
 
 		case "NAverage":
-			await cdm_db
-				.getNewestMeasurements(Date.now() - config.filter.last)
-				.then((measurementsPrIdentifier: GroupedMeasurements) => {
-					// FILTER AND CALCULATE THE AVERAGE
-					const sanatizedData: measurement[][] = [];
-					measurementsPrIdentifier.forEach((measurements) => {
-						let sumDBM: number;
-						let avgDBM: number;
-						let avgx: number;
-						let avgy: number;
-						const timestamp: number = measurements[0].timestamp;
-
-						measurements.forEach((measurement) => {
-							sumDBM += measurement.strengthDBM;
-							console.log(
-								`Identifier: ${measurement.identifier} Timestamp: ${measurement.timestamp}`,
-							);
-						});
-					});
-
-					return measurementsPrIdentifier; // Change return to filtered data
-				})
-				.catch((error: Error) => {
-					console.error(error);
-					return [];
-				});
+			try {
+				data = await cdm_db.getNewestMeasurements(
+					Date.now() - config.filter.last,
+				);
+			} catch (error) {
+				console.error(error);
+			}
+			data = averageMeasurements(data);
 			break;
 	}
 	return data;
@@ -146,14 +128,14 @@ function calculateDistance(
 	);
 }
 /*Propagation model
-* P_hat(d) = P_0 - 10 * n * log10(d/d_0) + X_gaussian_random_variable
-
-*d isolated:
-* d=10 ^ (-(s-s_0)/ (10 * n))* d_0
-* s : signal strength
-* 
-* n = - ((ln(10) * s - ln(10) * s_0) / (10 * ln(d/d_0)))
-*/
+	* P_hat(d) = P_0 - 10 * n * log10(d/d_0) + X_gaussian_random_variable
+	
+	*d isolated:
+	* d=10 ^ (-(s-s_0)/ (10 * n))* d_0
+	* s : signal strength
+	* 
+	* n = - ((ln(10) * s - ln(10) * s_0) / (10 * ln(d/d_0)))
+	*/
 
 function getPathLossExponent(
 	snStrength0: number,
@@ -166,4 +148,45 @@ function getPathLossExponent(
 		((log(10) * snStrength - log(10) * snStrength0) /
 			(10 * log(distance / distance0)))
 	);
+}
+
+export type AveragedAntennaMeasurements = DefaultMap<
+	string,
+	Map<number, number>
+>;
+
+function averageMeasurements(data: GroupedMeasurements): GroupedMeasurements {
+	const averagedData: GroupedMeasurements = new DefaultMap(
+		() => new DefaultMap(() => new Map()),
+	);
+	for (const [identifier, idMeasurements] of data) {
+		const averagedDataId = averagedData.getSet(identifier);
+		for (const [antId, antMeasurements] of idMeasurements) {
+			let sum: number = 0;
+			let count: number = 0;
+			let timestampSum = 0;
+			const mids: number[] = [];
+			for (const [timestamp, measurement] of antMeasurements) {
+				sum += measurement.strengthDBM;
+				timestampSum += timestamp;
+				count++;
+				timestampSum = timestamp;
+				if (Array.isArray(measurement.mid)) {
+					mids.push(...measurement.mid);
+				} else {
+					mids.push(measurement.mid);
+				}
+			}
+			const average: number = sum / count;
+			const averageTimestamp = timestampSum / count;
+			const timestampMap = new Map();
+			timestampMap.set(averageTimestamp, {
+				mid: mids,
+				strengthDBM: average,
+			});
+			averagedDataId.set(antId, timestampMap);
+		}
+	}
+
+	return averagedData;
 }
