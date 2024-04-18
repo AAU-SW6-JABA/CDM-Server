@@ -15,7 +15,7 @@ program
 
 program.option(
 	"-r, --reset-database",
-	"delete all the entries in the database",
+	"delete all the entries in the database on launch",
 );
 
 program.parse();

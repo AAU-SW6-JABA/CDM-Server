@@ -33,7 +33,8 @@
 	},
 	"scripts": {
 		"setup:proto-types": "yarn run proto-loader-gen-types --grpcLib=@grpc/grpc-js --outDir=gen/protobuf CDM-ProtocolBuffer/cdm_protobuf.proto",
-		"setup": "yarn setup:proto-types",
+		"setup:prisma": "yarn run prisma migrate dev --name init && yarn run prisma generate",
+		"setup": "yarn && yarn setup:proto-types && yarn setup:prisma",
 		"format": "prettier -w .",
 		"lint": "eslint . --fix",
 		"dev": "nodemon --exec vite-node ./src/index.ts",
