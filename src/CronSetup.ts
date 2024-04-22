@@ -39,7 +39,6 @@ async function calculateLocations() {
 		config.calculationCalibration.distanceCalibration0,
 	);
 	const data: GroupedMeasurements = await gatherMeasurementData();
-	console.log(data);
 
 	for (const [identifier, idMeasurements] of data) {
 		const calctime: number = Date.now();
@@ -50,15 +49,12 @@ async function calculateLocations() {
 			const antenna: antennas = await cdm_db.getAntennasUsingAid(antId);
 			for (const [timestamp, measurement] of antMeasurements) {
 				let distance: number;
-				let x: number;
-				let y: number;
 				distance = calculateDistance(
 					config.calculationCalibration.signalStrengthCalibration0,
 					measurement.strengthDBM,
 					config.calculationCalibration.distanceCalibration0,
 					pathLossExponent,
 				);
-				console.log(`Distance: ${distance}`);
 
 				trilaterationData.push({
 					x: antenna.x,
@@ -69,7 +65,6 @@ async function calculateLocations() {
 		}
 		//Calculate the coordinates for
 		coordinates = GetXAndY(trilaterationData);
-		console.log(`X: ${coordinates.x} Y: ${coordinates.y}`);
 		//Insert the location into the database
 		//Insert the calculations
 		await cdm_db

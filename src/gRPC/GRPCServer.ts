@@ -120,7 +120,11 @@ export class GRPCServer {
 		let failed = false;
 
 		for (const antenna of antennas) {
-			if (!antenna.aid || !antenna.x || !antenna.y) {
+			if (
+				typeof antenna.aid != "string" ||
+				typeof antenna.x != "number" ||
+				typeof antenna.y != "number"
+			) {
 				failingAntennas.push(antenna);
 				failed = true;
 			} else {
@@ -189,7 +193,12 @@ export class GRPCServer {
 		let failed = false;
 
 		for (const loc of location) {
-			if (!loc.identifier || !loc.calctime || !loc.x || !loc.y) {
+			if (
+				typeof loc.identifier != "string" ||
+				typeof loc.calctime != "number" ||
+				typeof loc.x != "number" ||
+				typeof loc.y != "number"
+			) {
 				failingLocations.push(loc);
 				failed = true;
 			} else {

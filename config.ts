@@ -6,13 +6,13 @@ export default defineConfig({
 	},
 	filter: {
 		method: "NAverage",
-		last: Date.now(),
+		last: 10_000,
 	},
 	calculationMethod: "default",
 	calculationCalibration: {
-		signalStrengthCalibration0: -2,
-		signalStrengthCalibration1: -6,
-		distanceCalibration0: 2,
+		signalStrengthCalibration0: -28,
+		signalStrengthCalibration1: -96,
+		distanceCalibration0: 1,
 		distanceCalibration1: 10,
 	},
 });
