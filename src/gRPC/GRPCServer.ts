@@ -14,6 +14,10 @@ import { LogMeasurementsRequest__Output } from "../../gen/protobuf/cdm_protobuf/
 import { RegisterAntennaRequest__Output } from "../../gen/protobuf/cdm_protobuf/RegisterAntennaRequest.ts";
 import { RegisterAntennaResponse } from "../../gen/protobuf/cdm_protobuf/RegisterAntennaResponse.ts";
 import type { antennas, location } from "@prisma/client";
+import { subscribers } from "./Subscribe.ts";
+import { SubscribeRequest__Output } from "../../gen/protobuf/cdm_protobuf/SubscribeRequest.ts";
+import { Locations } from "../../gen/protobuf/cdm_protobuf/Locations.ts";
+import { newLocations } from "../Locations.ts";
 
 export class GRPCServer {
 	cdm_protobuffer: ProtoGrpcType;
@@ -76,6 +80,14 @@ export class GRPCServer {
 			>,
 			callback: grpc.sendUnaryData<RegisterAntennaResponse>,
 		) => this.registerAntennaRoute(call, callback),
+
+		//Allows for clients to subscribe to new locations
+		SubscribeToLocations: (
+			stream: grpc.ServerWritableStream<
+				SubscribeRequest__Output,
+				Locations
+			>,
+		) => this.subscribeRequest(stream),
 	};
 	getAntennasRoute(
 		call: grpc.ServerUnaryCall<Empty__Output, GetAntennasResponse>,
@@ -108,7 +120,11 @@ export class GRPCServer {
 		let failed = false;
 
 		for (const antenna of antennas) {
-			if (!antenna.aid || !antenna.x || !antenna.y) {
+			if (
+				typeof antenna.aid != "string" ||
+				typeof antenna.x != "number" ||
+				typeof antenna.y != "number"
+			) {
 				failingAntennas.push(antenna);
 				failed = true;
 			} else {
@@ -177,7 +193,12 @@ export class GRPCServer {
 		let failed = false;
 
 		for (const loc of location) {
-			if (!loc.identifier || !loc.calctime || !loc.x || !loc.y) {
+			if (
+				typeof loc.identifier != "string" ||
+				typeof loc.calctime != "number" ||
+				typeof loc.x != "number" ||
+				typeof loc.y != "number"
+			) {
 				failingLocations.push(loc);
 				failed = true;
 			} else {
@@ -270,6 +291,31 @@ export class GRPCServer {
 			});
 	}
 
+	subscribeRequest(
+		stream: grpc.ServerWritableStream<SubscribeRequest__Output, Locations>,
+	) {
+		subscribers.add(stream);
+		this.streamLocations();
+	}
+	streamLocationsTimeout: NodeJS.Timeout | number | undefined;
+	streamLocations() {
+		clearTimeout(this.streamLocationsTimeout);
+		if (newLocations.length > 0) {
+			for (const stream of subscribers) {
+				if (stream.cancelled || stream.closed) {
+					subscribers.delete(stream);
+				} else {
+					stream.write({ location: newLocations });
+				}
+			}
+			newLocations.length = 0;
+		}
+		if (subscribers.size > 0) {
+			this.streamLocationsTimeout = setTimeout(() => {
+				this.streamLocations();
+			}, 100);
+		}
+	}
 	//Set up gRPC server with all services
 	getServer(): grpc.Server {
 		const server = new grpc.Server();

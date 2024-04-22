@@ -5,13 +5,14 @@ export default defineConfig({
 		locationCalculation: "*/10 * * * * *",
 	},
 	filter: {
-		method: "none",
+		method: "NAverage",
+		last: 10_000,
 	},
 	calculationMethod: "default",
-	calculationCalibrations: {
-		signalStrengthCalibration0: 0,
-		signalStrengthCalibration1: 0,
-		distanceCalibration0: 0,
-		distanceCalibration1: 0,
+	calculationCalibration: {
+		signalStrengthCalibration0: -28,
+		signalStrengthCalibration1: -96,
+		distanceCalibration0: 1,
+		distanceCalibration1: 10,
 	},
 });

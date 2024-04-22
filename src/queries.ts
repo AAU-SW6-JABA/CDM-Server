@@ -5,6 +5,15 @@ import type {
 	calculation,
 	measurement,
 } from "@prisma/client";
+import { DefaultMap } from "./DefaultMap.ts";
+
+export type GroupedMeasurements = DefaultMap<
+	string,
+	DefaultMap<
+		number,
+		Map<number, { mid: number | number[]; strengthDBM: number }>
+	>
+>;
 
 class CDMDatabase {
 	public Prisma: PrismaClient;
@@ -73,30 +82,45 @@ class CDMDatabase {
 	async getAllMeasurements(): Promise<measurement[]> {
 		return await this.Prisma.measurement.findMany();
 	}
-
-	async getNNewestMeasurements(n: number = 1): Promise<measurement[][]> {
-		const identifiers = await this.Prisma.measurement.findMany({
-			select: {
-				identifier: true,
+	/*
+	 *	Struktur af hvad ✨regnbue✨ vi gerne vil have
+	 *	[imsi1: [antenne1: [measurements], antenne2: [measurements]], imsi2: [...],  imsi3: [...]]
+	 */
+	async getNewestMeasurements(limit: number): Promise<GroupedMeasurements> {
+		const measurements = await this.Prisma.measurement.findMany({
+			orderBy: [
+				{
+					identifier: "asc",
+				},
+				{
+					aid: "asc",
+				},
+				{
+					timestamp: "asc",
+				},
+			],
+			where: {
+				timestamp: {
+					gt: limit,
+				},
 			},
-			distinct: ["identifier"],
 		});
-
-		const promises = identifiers.map((identifier) =>
-			this.Prisma.measurement.findMany({
-				where: {
-					identifier: identifier.identifier,
-				},
-				orderBy: {
-					timestamp: "desc",
-				},
-				take: n,
-			}),
+		const groupedMeasurements: GroupedMeasurements = new DefaultMap(
+			() => new DefaultMap(() => new Map()),
 		);
-
-		const measurements = Promise.all(promises);
-
-		return measurements;
+		for (const measurement of measurements) {
+			const identifierMeasurements = groupedMeasurements.getSet(
+				measurement.identifier,
+			);
+			const antennaMeasurements = identifierMeasurements.getSet(
+				measurement.aid,
+			);
+			antennaMeasurements.set(measurement.timestamp, {
+				mid: measurement.mid,
+				strengthDBM: measurement.strengthDBM,
+			});
+		}
+		return groupedMeasurements;
 	}
 
 	async getMeasurementsBetweenTimestamps(
