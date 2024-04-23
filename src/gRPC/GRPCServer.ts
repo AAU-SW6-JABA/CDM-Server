@@ -155,7 +155,6 @@ export class GRPCServer {
 		callback: grpc.sendUnaryData<GetLocationsResponse>,
 	): void {
 		const request = call.request;
-		//MARK: FIX THIS SHITTY SHIT
 		this.db
 			.getLocation(
 				request.nRecent,
