@@ -34,7 +34,7 @@ class CDMDatabase {
 		let correctStartTime;
 		let correctEndTime;
 		//If both are defined
-		if (typeof timestart != "undefined" && typeof timeend != "undefined") {
+		if (timestart !== undefined && timeend !== undefined) {
 			if (timestart < timeend) {
 				correctStartTime = timeend;
 				correctEndTime = timestart;
@@ -43,17 +43,11 @@ class CDMDatabase {
 				correctEndTime = timeend;
 			}
 			//if only timeend is defined
-		} else if (
-			typeof timestart == "undefined" &&
-			typeof timeend != "undefined"
-		) {
+		} else if (timestart === undefined && timeend !== undefined) {
 			correctStartTime = timeend;
 			correctEndTime = 0;
 			//if only timestart is defined
-		} else if (
-			typeof timeend == "undefined" &&
-			typeof timestart != "undefined"
-		) {
+		} else if (timeend === undefined && timestart !== undefined) {
 			correctEndTime = 0;
 			correctStartTime = timestart;
 			//if none are defined
@@ -63,7 +57,7 @@ class CDMDatabase {
 		}
 
 		//Checks whether the query should be based on a specific identifier or all
-		if (typeof identifer == "undefined") {
+		if (!identifer) {
 			identifer = [];
 			const data = await this.Prisma.location.findMany({
 				select: { identifier: true },
@@ -72,7 +66,7 @@ class CDMDatabase {
 			identifer.push(...data.map((row) => row.identifier));
 		}
 		let locations: location[] = [];
-		if (n_recent != undefined) {
+		if (n_recent !== undefined) {
 			for (let id of identifer) {
 				let recentlocations = await this.Prisma.location.findMany({
 					where: {
