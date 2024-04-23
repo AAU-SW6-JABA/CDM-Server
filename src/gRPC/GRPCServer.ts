@@ -155,19 +155,12 @@ export class GRPCServer {
 		callback: grpc.sendUnaryData<GetLocationsResponse>,
 	): void {
 		const request = call.request;
-		if (typeof request.method !== "number") {
-			callback({
-				code: grpc.status.INVALID_ARGUMENT,
-				details: "Expected method",
-			});
-			return;
-		}
 		this.db
 			.getLocation(
-				request.method,
-				request.identifier,
-				request.timeinterval,
 				request.nRecent,
+				request.timeBegin,
+				request.timeEnd,
+				request.identifier,
 			)
 			.then((locations) => {
 				const response =
