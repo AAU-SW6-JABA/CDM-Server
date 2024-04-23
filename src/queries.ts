@@ -57,7 +57,7 @@ class CDMDatabase {
 		}
 
 		//Checks whether the query should be based on a specific identifier or all
-		if (!identifer) {
+		if (!identifer || identifer.length === 0) {
 			identifer = [];
 			const data = await this.Prisma.location.findMany({
 				select: { identifier: true },
