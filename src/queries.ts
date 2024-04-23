@@ -23,60 +23,88 @@ class CDMDatabase {
 	}
 
 	async getLocation(
-		method: number,
-		identifier?: string,
-		timeinterval?: number,
 		n_recent?: number,
+		timestart?: number,
+		timeend?: number,
+		identifer?: string[],
 	): Promise<location[]> {
-		switch (method) {
-			//Getting Location/s using Identifier.
-			case 0: {
-				if (!identifier) {
-					throw new Error("An identifer is requried");
-				}
-				const query: Prisma.locationFindManyArgs = {};
+		//Set default value for n_recent
 
-				query.where = {
-					identifier: identifier,
-				};
+		//insure that timestart and timeend are defined the correct way
+		let correctStartTime;
+		let correctEndTime;
+		//If both are defined
+		if (typeof timestart != "undefined" && typeof timeend != "undefined") {
+			if (timestart < timeend) {
+				correctStartTime = timeend;
+				correctEndTime = timestart;
+			} else {
+				correctStartTime = timestart;
+				correctEndTime = timeend;
+			}
+			//if only timeend is defined
+		} else if (
+			typeof timestart == "undefined" &&
+			typeof timeend != "undefined"
+		) {
+			correctStartTime = timeend;
+			correctEndTime = 0;
+			//if only timestart is defined
+		} else if (
+			typeof timeend == "undefined" &&
+			typeof timestart != "undefined"
+		) {
+			correctEndTime = 0;
+			correctStartTime = timestart;
+			//if none are defined
+		} else {
+			correctStartTime = Date.now();
+			correctEndTime = 0;
+		}
 
-				return await this.Prisma.location.findMany(query);
-			}
-			//Gettting location/s using timestamp in unix time.
-			case 1: {
-				if (!timeinterval) {
-					throw new Error("A time interval is required");
-				}
-				const query: Prisma.locationFindManyArgs = {};
-				const endTime = Date.now();
-				query.where = {
-					calctime: {
-						gte: timeinterval, //Greater than or equal to
-						lte: endTime, //Less than or equal to
-					},
-				};
-				return await this.Prisma.location.findMany(query);
-			}
-			//Getting n most recent location/s
-			case 2: {
-				if (!n_recent) {
-					throw new Error(
-						"The number of recent locations is requried",
-					);
-				}
-				return await this.Prisma.location.findMany({
-					orderBy: {
-						calctime: "desc",
+		//Checks whether the query should be based on a specific identifier or all
+		if (typeof identifer == "undefined") {
+			identifer = [];
+			const data = await this.Prisma.location.findMany({
+				select: { identifier: true },
+				distinct: ["identifier"],
+			});
+			identifer.push(...data.map((row) => row.identifier));
+		}
+		let locations: location[] = [];
+		if (n_recent != undefined) {
+			for (let id of identifer) {
+				let recentlocations = await this.Prisma.location.findMany({
+					where: {
+						identifier: id,
+						calctime: {
+							lte: correctStartTime,
+							gte: correctEndTime,
+						},
 					},
 					take: n_recent,
+					orderBy: { calctime: "desc" },
 				});
+				locations.push(...recentlocations);
 			}
-			//Gettting all location
-			case 3: {
-				return await this.Prisma.location.findMany();
+			return locations;
+		} else {
+			let locations: location[] = [];
+			for (let id of identifer) {
+				let recentlocations = await this.Prisma.location.findMany({
+					where: {
+						identifier: id,
+						calctime: {
+							lte: correctStartTime,
+							gte: correctEndTime,
+						},
+					},
+					orderBy: { calctime: "desc" },
+				});
+				locations.push(...recentlocations);
 			}
+			return locations;
 		}
-		throw new Error("Method is requried");
 	}
 
 	async getAllMeasurements(): Promise<measurement[]> {
