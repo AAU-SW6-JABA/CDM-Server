@@ -239,6 +239,14 @@ class CDMDatabase {
 	}
 
 	async insertAntenna(x: number, y: number): Promise<antennas> {
+		const allAtennas = await this.getAllAntennas();
+		//If antenna already exist on the coord: Do not add it
+		for (let antenna of allAtennas) {
+			if (antenna.x === x && antenna.y === y) {
+				return antenna;
+			}
+		}
+
 		const antenna = await this.Prisma.antennas.create({
 			data: {
 				x: x,
