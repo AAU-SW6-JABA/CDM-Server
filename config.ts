@@ -10,8 +10,8 @@ export default defineConfig({
 	},
 	calculationMethod: "default",
 	calculationCalibration: {
-		signalStrengthCalibration0: -28,
-		signalStrengthCalibration1: -96,
+		signalStrengthCalibration0: -20,
+		signalStrengthCalibration1: -70,
 		distanceCalibration0: 1,
 		distanceCalibration1: 10,
 	},
