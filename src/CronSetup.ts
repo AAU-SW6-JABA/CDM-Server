@@ -63,8 +63,13 @@ async function calculateLocations() {
 				});
 			}
 		}
-		//Calculate the coordinates for
-		coordinates = GetXAndY(trilaterationData);
+		try {
+			//Calculate the coordinates for
+			coordinates = GetXAndY(trilaterationData);
+		} catch (error) {
+			continue;
+		}
+
 		//Insert the location into the database
 		//Insert the calculations
 		await cdm_db
