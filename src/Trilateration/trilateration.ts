@@ -2,8 +2,12 @@ import { TrilaterationData } from "./TrilaterationData.ts";
 import { Coordinates } from "./Coordinates.ts";
 
 export function GetXAndY(antennas: TrilaterationData[]): Coordinates {
-	if (antennas.length < 3) {
-		throw new Error("Invalid input: At least 3 antennas are required.");
+	try {
+		if (antennas.length < 3) {
+			throw new Error("Invalid input: At least 3 antennas are required.");
+		}
+	} catch (error) {
+		console.log(error);
 	}
 
 	// Calculate squared distances to each antenna
