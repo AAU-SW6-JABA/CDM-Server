@@ -74,7 +74,8 @@ async function calculateLocations() {
 			});
 		//send data to subscribers => locations
 		newLocations.push({
-			identifier: identifier,
+			identifier,
+			calctime,
 			x: coordinates.x,
 			y: coordinates.y,
 		});
