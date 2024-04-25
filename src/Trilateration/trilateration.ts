@@ -2,6 +2,9 @@ import { TrilaterationData } from "./TrilaterationData.ts";
 import { Coordinates } from "./Coordinates.ts";
 
 export function GetXAndY(antennas: TrilaterationData[]): Coordinates {
+	if (antennas.length < 3) {
+		throw new Error("Not enough antennas to calculate location");
+	}
 	// Calculate squared distances to each antenna
 	const AntennasSquared = antennas.map(
 		(antenna) => antenna.x ** 2 + antenna.y ** 2,
