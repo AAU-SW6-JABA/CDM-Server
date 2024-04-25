@@ -1,5 +1,4 @@
 import { schedule } from "node-cron";
-import { log } from "mathjs";
 import config from "../config.ts";
 import cdm_db, { GroupedMeasurements } from "./queries.ts";
 import { antennas } from "@prisma/client";
@@ -63,8 +62,9 @@ async function calculateLocations() {
 				});
 			}
 		}
+
+    // Attempt to calculate the coordinates for
 		try {
-			//Calculate the coordinates for
 			coordinates = GetXAndY(trilaterationData);
 		} catch (error) {
 			continue;
@@ -122,11 +122,12 @@ function calculateDistance(
 	calibratedDistance: number,
 	pathLossExponent: number,
 ): number {
-	return (
-		10 **
-		((-(calibratedStrength - snStrength1) / (10 * pathLossExponent)) *
-			calibratedDistance)
-	);
+	const distance =
+		calibratedDistance *
+		Math.E **
+			((calibratedStrength - snStrength1) / (10 * pathLossExponent));
+
+	return distance;
 }
 /*Propagation model
 	* P_hat(d) = P_0 - 10 * n * log10(d/d_0) + X_gaussian_random_variable
@@ -144,11 +145,10 @@ function getPathLossExponent(
 	distance0: number,
 	distance: number,
 ): number {
-	return (
-		-1 *
-		((log(10) * snStrength - log(10) * snStrength0) /
-			(10 * log(distance / distance0)))
-	);
+	const pathLossExponent =
+		(snStrength0 - snStrength) / (10 * Math.log(distance / distance0));
+
+	return pathLossExponent;
 }
 
 export type AveragedAntennaMeasurements = DefaultMap<

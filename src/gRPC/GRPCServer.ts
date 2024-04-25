@@ -121,7 +121,7 @@ export class GRPCServer {
 
 		for (const antenna of antennas) {
 			if (
-				typeof antenna.aid != "string" ||
+				typeof antenna.aid != "number" ||
 				typeof antenna.x != "number" ||
 				typeof antenna.y != "number"
 			) {
