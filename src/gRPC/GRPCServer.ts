@@ -197,9 +197,9 @@ export class GRPCServer {
 			} else {
 				locationObject.location.push({
 					identifier: loc.identifier,
+					calctime: loc.calctime,
 					x: loc.x,
 					y: loc.y,
-					calctime: loc.calctime,
 				});
 			}
 		}
