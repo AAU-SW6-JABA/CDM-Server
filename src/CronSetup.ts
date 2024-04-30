@@ -60,13 +60,22 @@ async function calculateLocations() {
 					y: antenna.y,
 					distance: distance,
 				});
+				if (typeof measurement.mid !== "number") {
+					for (const mid of measurement.mid) {
+						await cdm_db.insertCalculations(
+							identifier,
+							calctime,
+							mid,
+						);
+					}
+				}
 			}
 		}
-
-    // Attempt to calculate the coordinates for
+		// Attempt to calculate the coordinates for
 		try {
 			coordinates = GetXAndY(trilaterationData);
 		} catch (error) {
+			console.error(error);
 			continue;
 		}
 
