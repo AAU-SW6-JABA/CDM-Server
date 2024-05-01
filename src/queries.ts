@@ -189,7 +189,6 @@ class CDMDatabase {
 		//Finding all measurements based on calculations
 		return this.Prisma.location.findMany({
 			where: { identifier: identifer, calctime: calctime },
-			include: { calculation: true },
 		});
 	}
 
