@@ -2,7 +2,7 @@ import { defineConfig } from "./src/zodConfig/zodSchemas.ts";
 
 export default defineConfig({
 	cron_intervals: {
-		locationCalculation: "*/10 * * * * *",
+		locationCalculation: "*/2 * * * * *",
 	},
 	filter: {
 		method: "NAverage",
