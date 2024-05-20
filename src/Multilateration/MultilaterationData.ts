@@ -1,4 +1,4 @@
-export interface TrilaterationData {
+export interface MultilaterationData {
 	x: number;
 	y: number;
 	distance: number;

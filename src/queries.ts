@@ -104,10 +104,7 @@ class CDMDatabase {
 	async getAllMeasurements(): Promise<measurement[]> {
 		return await this.Prisma.measurement.findMany();
 	}
-	/*
-	 *	Struktur af hvad ✨regnbue✨ vi gerne vil have
-	 *	[imsi1: [antenne1: [measurements], antenne2: [measurements]], imsi2: [...],  imsi3: [...]]
-	 */
+
 	async getNewestMeasurements(limit: number): Promise<GroupedMeasurements> {
 		const measurements = await this.Prisma.measurement.findMany({
 			orderBy: [
