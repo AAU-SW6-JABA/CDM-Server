@@ -4,7 +4,7 @@ import cdm_db, { GroupedMeasurements } from "./queries.ts";
 import { antennas } from "@prisma/client";
 import mltcartesian from "./Multilateration/multilateration.ts";
 import { MultilaterationData } from "./Multilateration/MultilaterationData.ts";
-import { Coordinates } from "./Multilateration/Coordinates.ts";
+import { Coordinate } from "./Multilateration/Coordinate.ts";
 import { newLocations } from "./Locations.ts";
 import { DefaultMap } from "./DefaultMap.ts";
 
@@ -41,7 +41,7 @@ async function calculateLocations() {
 
 	for (const [identifier, idMeasurements] of data) {
 		const calctime: number = getCestUnixTime();
-		let coordinates: Coordinates;
+		let coordinate: Coordinate;
 		const trilaterationData: MultilaterationData[] = [];
 		//All measurements with the same identifier
 		for (const [antId, antMeasurements] of idMeasurements) {
@@ -73,7 +73,7 @@ async function calculateLocations() {
 		}
 		// Attempt to calculate the coordinates for
 		try {
-			coordinates =
+			coordinate =
 				mltcartesian.estimateDeviceCoordinate(trilaterationData);
 		} catch (error) {
 			console.error(error);
@@ -83,7 +83,7 @@ async function calculateLocations() {
 		//Insert the location into the database
 		//Insert the calculations
 		await cdm_db
-			.insertLocations(identifier, calctime, coordinates.x, coordinates.y)
+			.insertLocations(identifier, calctime, coordinate.x, coordinate.y)
 			.catch((error: Error) => {
 				console.log(error);
 			});
@@ -91,8 +91,8 @@ async function calculateLocations() {
 		newLocations.push({
 			identifier,
 			calctime,
-			x: coordinates.x,
-			y: coordinates.y,
+			x: coordinate.x,
+			y: coordinate.y,
 		});
 	}
 }

@@ -1,6 +1,6 @@
 import * as mathjs from "mathjs";
 import { MultilaterationData } from "./MultilaterationData.ts";
-import { Coordinates as Coordinate } from "./Coordinates.ts";
+import { Coordinate } from "./Coordinate.ts";
 
 const sqrt = Math.sqrt;
 
