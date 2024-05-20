@@ -40,7 +40,7 @@ async function calculateLocations() {
 	const data: GroupedMeasurements = await gatherMeasurementData();
 
 	for (const [identifier, idMeasurements] of data) {
-		const calctime: number = getCestUnixTime();
+		const calctime: number = Date.now();
 		let coordinate: Coordinate;
 		const trilaterationData: MultilaterationData[] = [];
 		//All measurements with the same identifier
@@ -105,7 +105,7 @@ async function gatherMeasurementData(): Promise<GroupedMeasurements> {
 		case "none":
 			try {
 				data = await cdm_db.getNewestMeasurements(
-					getCestUnixTime() - config.filter.last,
+					Date.now() - config.filter.last,
 				); // TODO: sæt en værdi her som ikke er hard coded
 			} catch (error) {
 				console.error(error);
@@ -115,7 +115,7 @@ async function gatherMeasurementData(): Promise<GroupedMeasurements> {
 		case "NAverage":
 			try {
 				data = await cdm_db.getNewestMeasurements(
-					getCestUnixTime() - config.filter.last,
+					Date.now() - config.filter.last,
 				);
 			} catch (error) {
 				console.error(error);
@@ -126,16 +126,16 @@ async function gatherMeasurementData(): Promise<GroupedMeasurements> {
 	return data;
 }
 
-function getCestUnixTime(): number {
-	const miliSeconds = Date.now() % 1000;
-	const utcDate = new Date(Date.now());
-	const cestDate = new Date(
-		utcDate.toLocaleString("en-US", { timeZone: "Europe/Copenhagen" }),
-	);
-	cestDate.setMilliseconds(miliSeconds);
+//function getCestUnixTime(): number {
+//const miliSeconds = Date.now() % 1000;
+//const utcDate = new Date(Date.now());
+//const cestDate = new Date(
+//utcDate.toLocaleString("en-US", { timeZone: "Europe/Copenhagen" }),
+//);
+//cestDate.setMilliseconds(miliSeconds);
 
-	return cestDate.getTime() / 1000;
-}
+//return cestDate.getTime() / 1000;
+//}
 
 function calculateDistance(
 	calibratedStrength: number,
