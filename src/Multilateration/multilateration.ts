@@ -192,7 +192,6 @@ class MultilaterationCartesian2D {
 			previousEstimates.push({ x: newEstimate[0], y: newEstimate[1] });
 
 			if (this.isConverged(previousEstimates)) {
-				console.log(`Converged after ${i} iterations`);
 				estimate = { x: newEstimate[0], y: newEstimate[1] };
 				break;
 			}
