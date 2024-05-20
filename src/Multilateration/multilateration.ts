@@ -11,6 +11,8 @@ class MultilaterationCartesian2D {
 	 * First performs a linear regression to achieve a rough estimate of the coordinates.
 	 * Then applies Newton's method to iteratively improve the estimate.
 	 * Improvements are measured with the squared errors algorithm.
+	 * 
+	 * Inspired by: https://github.com/zwigglers/multilateration/
 	 *
 	 * @param measurements - All measurements to use in the estimation.
 	 * @param iterations - The number of estimate improvement iterations.
