@@ -1,5 +1,5 @@
 import * as mathjs from "mathjs";
-import { TrilaterationData } from "./TrilaterationData.ts";
+import { MultilaterationData } from "./MultilaterationData.ts";
 import { Coordinates as Coordinate } from "./Coordinates.ts";
 
 const sqrt = Math.sqrt;
@@ -17,7 +17,7 @@ class MultilaterationCartesian2D {
 	 * @returns - The estimated position of the device.
 	 */
 	estimateDeviceCoordinate(
-		measurements: TrilaterationData[],
+		measurements: MultilaterationData[],
 		iterations = 30,
 	): Coordinate {
 		const sortedMeasurements = this.sortMeasurements(measurements);
@@ -43,7 +43,9 @@ class MultilaterationCartesian2D {
 	 * @param measurements  - All measurements to use in the estimation.
 	 * @returns - The measurements, sorted.
 	 */
-	sortMeasurements(measurements: TrilaterationData[]): TrilaterationData[] {
+	sortMeasurements(
+		measurements: MultilaterationData[],
+	): MultilaterationData[] {
 		return measurements.sort((a, b) => {
 			if (a.x === b.x) {
 				return a.y - b.y;
@@ -64,7 +66,7 @@ class MultilaterationCartesian2D {
 	 * @param measurements - All measurements to use in the estimation.
 	 * @returns - The estimated position of the device.
 	 */
-	roughlyEstimateCoordinate(measurements: TrilaterationData[]): Coordinate {
+	roughlyEstimateCoordinate(measurements: MultilaterationData[]): Coordinate {
 		if (measurements.length < 2) {
 			throw new Error("Not enough observations");
 		}
@@ -163,7 +165,7 @@ class MultilaterationCartesian2D {
 	 */
 	improveEstimate(
 		startEstimate: Coordinate,
-		measurements: TrilaterationData[],
+		measurements: MultilaterationData[],
 		iterations: number,
 	): Coordinate {
 		let estimate = startEstimate;
@@ -222,7 +224,7 @@ class MultilaterationCartesian2D {
 	 */
 	jacobianMatrix(
 		deviceCoordinate: Coordinate,
-		measurements: TrilaterationData[],
+		measurements: MultilaterationData[],
 	): [[number, number], [number, number]] {
 		return [
 			[
@@ -276,7 +278,7 @@ class MultilaterationCartesian2D {
 	 */
 	squaredErrors(
 		deviceCoordinate: Coordinate,
-		measurements: TrilaterationData[],
+		measurements: MultilaterationData[],
 	): number {
 		let squaredError = 0;
 		for (const measurement of measurements) {
@@ -299,7 +301,7 @@ class MultilaterationCartesian2D {
 	 */
 	firstOrderPartialDerivativesForX(
 		deviceCoordinate: Coordinate,
-		measurements: TrilaterationData[],
+		measurements: MultilaterationData[],
 	): number {
 		let derivative = 0;
 		for (const measurement of measurements) {
@@ -317,7 +319,7 @@ class MultilaterationCartesian2D {
 	 */
 	firstOrderPartialDerivativeForX(
 		deviceCoordinate: Coordinate,
-		measurement: TrilaterationData,
+		measurement: MultilaterationData,
 	): number {
 		const x = deviceCoordinate.x;
 		const y = deviceCoordinate.y;
@@ -337,7 +339,7 @@ class MultilaterationCartesian2D {
 	 */
 	firstOrderPartialDerivativesForY(
 		deviceCoordinate: Coordinate,
-		measurements: TrilaterationData[],
+		measurements: MultilaterationData[],
 	): number {
 		let derivative = 0;
 		for (const measurement of measurements) {
@@ -356,7 +358,7 @@ class MultilaterationCartesian2D {
 	 */
 	firstOrderPartialDerivativeForY(
 		deviceCoordinate: Coordinate,
-		measurement: TrilaterationData,
+		measurement: MultilaterationData,
 	): number {
 		return this.firstOrderPartialDerivativeForX(
 			{
@@ -384,7 +386,7 @@ class MultilaterationCartesian2D {
 	 */
 	secondOrderPartialDerivativesForXX(
 		deviceCoordinate: Coordinate,
-		measurements: TrilaterationData[],
+		measurements: MultilaterationData[],
 	): number {
 		let derivative = 0;
 		for (const measurement of measurements) {
@@ -402,7 +404,7 @@ class MultilaterationCartesian2D {
 	 */
 	secondOrderPartialDerivativeForXX(
 		deviceCoordinate: Coordinate,
-		measurement: TrilaterationData,
+		measurement: MultilaterationData,
 	): number {
 		const x = deviceCoordinate.x;
 		const y = deviceCoordinate.y;
@@ -422,7 +424,7 @@ class MultilaterationCartesian2D {
 	 */
 	secondOrderPartialDerivativesForYX(
 		deviceCoordinate: Coordinate,
-		measurements: TrilaterationData[],
+		measurements: MultilaterationData[],
 	): number {
 		let derivative = 0;
 		for (const measurement of measurements) {
@@ -440,7 +442,7 @@ class MultilaterationCartesian2D {
 	 */
 	secondOrderPartialDerivativeForYX(
 		deviceCoordinate: Coordinate,
-		measurement: TrilaterationData,
+		measurement: MultilaterationData,
 	): number {
 		const x = deviceCoordinate.x;
 		const y = deviceCoordinate.y;
@@ -458,7 +460,7 @@ class MultilaterationCartesian2D {
 	 */
 	secondOrderPartialDerivativesForXY(
 		deviceCoordinate: Coordinate,
-		measurements: TrilaterationData[],
+		measurements: MultilaterationData[],
 	): number {
 		let derivative = 0;
 		for (const measurement of measurements) {
@@ -476,7 +478,7 @@ class MultilaterationCartesian2D {
 	 */
 	secondOrderPartialDerivativeForXY(
 		deviceCoordinate: Coordinate,
-		measurement: TrilaterationData,
+		measurement: MultilaterationData,
 	): number {
 		return this.secondOrderPartialDerivativeForYX(deviceCoordinate, {
 			x: measurement.y,
@@ -490,7 +492,7 @@ class MultilaterationCartesian2D {
 	 */
 	secondOrderPartialDerivativesForYY(
 		deviceCoordinate: Coordinate,
-		measurements: TrilaterationData[],
+		measurements: MultilaterationData[],
 	): number {
 		let derivative = 0;
 		for (const measurement of measurements) {
@@ -508,7 +510,7 @@ class MultilaterationCartesian2D {
 	 */
 	secondOrderPartialDerivativeForYY(
 		deviceCoordinate: Coordinate,
-		measurement: TrilaterationData,
+		measurement: MultilaterationData,
 	): number {
 		return this.secondOrderPartialDerivativeForXX(
 			{
