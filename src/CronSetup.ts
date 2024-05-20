@@ -2,7 +2,7 @@ import { schedule } from "node-cron";
 import config from "../config.ts";
 import cdm_db, { GroupedMeasurements } from "./queries.ts";
 import { antennas } from "@prisma/client";
-import { GetXAndY } from "./Trilateration/trilateration.ts";
+import mltcartesian from "./Trilateration/multilateration.ts";
 import { TrilaterationData } from "./Trilateration/TrilaterationData.ts";
 import { Coordinates } from "./Trilateration/Coordinates.ts";
 import { newLocations } from "./Locations.ts";
@@ -73,7 +73,7 @@ async function calculateLocations() {
 		}
 		// Attempt to calculate the coordinates for
 		try {
-			coordinates = GetXAndY(trilaterationData);
+			coordinates = mltcartesian.estimateDeviceCoordinate(trilaterationData);
 		} catch (error) {
 			console.error(error);
 			continue;
