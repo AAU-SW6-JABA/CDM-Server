@@ -11,12 +11,12 @@ program
 	.name("CDM-Server")
 	.description(
 		"Server that handles gRPC communication with nodes and clients as well as handling communication with a postgres DB.",
-	);
-
-program.option(
-	"-r, --reset-database",
-	"delete all the entries in the database on launch",
-);
+	)
+	.option(
+		"-r, --reset-database",
+		"delete all the entries in the database on launch",
+	)
+	.option("--identifier <type>", "identifier to use for the server");
 
 program.parse();
 const options = program.opts();
@@ -32,9 +32,16 @@ if (options.resetDatabase) {
 	});
 }
 
+let identifier: string | undefined;
+
+if (options.identifier) {
+	identifier = options.identifier;
+}
+
 //Start the gRPC server
 const server = new GRPCServer(
 	"CDM-ProtocolBuffer/cdm_protobuf.proto",
+	identifier,
 ).getServer();
 server.bindAsync(
 	`${process.env.HOST}:${process.env.PORT}`,
