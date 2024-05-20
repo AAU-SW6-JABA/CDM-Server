@@ -2,9 +2,9 @@ import { schedule } from "node-cron";
 import config from "../config.ts";
 import cdm_db, { GroupedMeasurements } from "./queries.ts";
 import { antennas } from "@prisma/client";
-import mltcartesian from "./Trilateration/multilateration.ts";
-import { MultilaterationData } from "./Trilateration/MultilaterationData.ts";
-import { Coordinates } from "./Trilateration/Coordinates.ts";
+import mltcartesian from "./Multilateration/multilateration.ts";
+import { MultilaterationData } from "./Multilateration/MultilaterationData.ts";
+import { Coordinates } from "./Multilateration/Coordinates.ts";
 import { newLocations } from "./Locations.ts";
 import { DefaultMap } from "./DefaultMap.ts";
 
