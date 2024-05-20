@@ -73,7 +73,8 @@ async function calculateLocations() {
 		}
 		// Attempt to calculate the coordinates for
 		try {
-			coordinates = mltcartesian.estimateDeviceCoordinate(trilaterationData);
+			coordinates =
+				mltcartesian.estimateDeviceCoordinate(trilaterationData);
 		} catch (error) {
 			console.error(error);
 			continue;
