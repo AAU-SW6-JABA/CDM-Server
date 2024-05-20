@@ -22,10 +22,12 @@ import { newLocations } from "../Locations.ts";
 export class GRPCServer {
 	cdm_protobuffer: ProtoGrpcType;
 	protoPath: string;
+	identifier: string | undefined;
 	db: typeof cdm_db;
 
-	constructor(protoPath: string) {
+	constructor(protoPath: string, identifier: string | undefined) {
 		this.protoPath = protoPath;
+		this.identifier = identifier;
 		this.cdm_protobuffer = this.setupProto();
 		this.db = cdm_db;
 	}
@@ -240,6 +242,16 @@ export class GRPCServer {
 			});
 			return;
 		}
+
+		// If an identifier is set, only log measurements with that identifier
+		if (
+			this.identifier !== undefined &&
+			measurement.identifier !== this.identifier
+		) {
+			callback(null, {});
+			return;
+		}
+
 		this.db
 			.insertMeasurement(
 				measurement.identifier,
