@@ -127,16 +127,14 @@ async function gatherMeasurementData(): Promise<GroupedMeasurements> {
 }
 
 function getCestUnixTime(): number {
-	// const miliSeconds = Date.now() % 1000;
-	// const utcDate = new Date(Date.now());
-	// const cestDate = new Date(
-	// 	utcDate.toLocaleString("en-US", { timeZone: "Europe/Copenhagen" }),
-	// );
-	// cestDate.setMilliseconds(miliSeconds);
+	const miliSeconds = Date.now() % 1000;
+	const utcDate = new Date(Date.now());
+	const cestDate = new Date(
+		utcDate.toLocaleString("en-US", { timeZone: "Europe/Copenhagen" }),
+	);
+	cestDate.setMilliseconds(miliSeconds);
 
-	// return cestDate.getTime() / 1000;
-
-	return Date.now();
+	return cestDate.getTime() / 1000;
 }
 
 function calculateDistance(
@@ -152,16 +150,10 @@ function calculateDistance(
 
 	return distance;
 }
-/*Propagation model
-	* P_hat(d) = P_0 - 10 * n * log10(d/d_0) + X_gaussian_random_variable
-	
-	*d isolated:
-	* d=10 ^ (-(s-s_0)/ (10 * n))* d_0
-	* s : signal strength
-	* 
-	* n = - ((ln(10) * s - ln(10) * s_0) / (10 * ln(d/d_0)))
-	*/
 
+/*Pathloss exponent calculated from the log-normal probagation model
+ *	Log-normal probagation model: PL(d) = PL(d0) - 10*n*log(d/d0)
+ */
 function getPathLossExponent(
 	snStrength0: number,
 	snStrength: number,
