@@ -94,6 +94,9 @@ class MultilaterationCartesian2D {
 		 *
 		 * And rewrite it =>
 		 * 2 * (mX1 ​− mX2​) * x + 2 * (mY1 ​− mY2) * y = (mX1 ** 2 ​+ mY1 ** 2 ​​− mDist1 ** 2​) − (mX2 ** 2 ​+ mY2 ** 2 ​− mDist2 ** 2​)
+		 * 
+		 * We need to subtract them because the original functions are not linear, but subtracting one with another results in a linear function
+		 * that moves through the points where the two circles intersect. This is a very good approximation of the original problem.
 		 *
 		 * We can put this into a 2x3 matrix and solve for x and y.
 		 *
