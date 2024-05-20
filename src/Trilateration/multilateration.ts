@@ -86,20 +86,19 @@ class MultilaterationCartesian2D {
 		 * We can rewrite the function as follows:
 		 * (mX - x) ** 2 + (mY - y) ** 2 - mDist ** 2 = 0
 		 *
-		 * We use four measurements to find the two free variables "x" and "y".
+		 * We use three measurements to find the two free variables "x" and "y".
 		 * We subtract the next measurement (m2) from the current measurement (m1):
 		 * (mX1 - x) ** 2 + (mY1 - y​) ** 2 − mDist1 ** 2 ​− (mX2 - x​) ** 2 − (mY2 - y​) ** 2 + mDist2 ** 2 = 0
 		 *
 		 * And rewrite it =>
 		 * 2 * (mX1 ​− mX2​) * x + 2 * (mY1 ​− mY2) * y = (mX1 ** 2 ​+ mY1 ** 2 ​​− mDist1 ** 2​) − (mX2 ** 2 ​+ mY2 ** 2 ​− mDist2 ** 2​)
 		 *
-		 * We can put this into a 3x3 matrix and solve for x and y.
+		 * We can put this into a 2x3 matrix and solve for x and y.
 		 *
 		 * The matrix will contain:
 		 * [
 		 * m1 - m2,
-		 * m2 - m3,
-		 * m3 - m4
+		 * m2 - m3
 		 * ]
 		 */
 
