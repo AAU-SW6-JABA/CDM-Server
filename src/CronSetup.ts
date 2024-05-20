@@ -153,7 +153,7 @@ function calculateDistance(
 }
 
 /*Pathloss exponent calculated from the log-normal probagation model
- *	Log-normal probagation model: PL(d) = PL(d0) - 10*n*log(d/d0)
+ *	Log-normal probagation model: P = P_0 - 10*n*log(d/d0)
  */
 function getPathLossExponent(
 	snStrength0: number,
