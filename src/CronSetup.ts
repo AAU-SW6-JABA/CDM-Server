@@ -127,14 +127,16 @@ async function gatherMeasurementData(): Promise<GroupedMeasurements> {
 }
 
 function getCestUnixTime(): number {
-	const miliSeconds = Date.now() % 1000;
-	const utcDate = new Date(Date.now());
-	const cestDate = new Date(
-		utcDate.toLocaleString("en-US", { timeZone: "Europe/Copenhagen" }),
-	);
-	cestDate.setMilliseconds(miliSeconds);
+	// const miliSeconds = Date.now() % 1000;
+	// const utcDate = new Date(Date.now());
+	// const cestDate = new Date(
+	// 	utcDate.toLocaleString("en-US", { timeZone: "Europe/Copenhagen" }),
+	// );
+	// cestDate.setMilliseconds(miliSeconds);
 
-	return cestDate.getTime() / 1000;
+	// return cestDate.getTime() / 1000;
+
+	return Date.now();
 }
 
 function calculateDistance(
